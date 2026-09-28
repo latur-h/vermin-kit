@@ -1,0 +1,48 @@
+---
+description: Poss.Win.Automation 1.0.5 public API. Call these instead of new Win32 wrappers.
+alwaysApply: true
+---
+
+# Poss.Win.Automation 1.0.5
+
+`Poss.Win.Automation` is a metapackage. Its DLL exports no types. Public API is `Poss.Win.Automation.Core`, `.Input`, and `.GlobalHotKeys`, all 1.0.5. `User32`, `Kernel32`, `SendInput`, hooks, `GetAsyncKeyState`, `GetWindowRect`, and `SetCursorPos` are internal. Keyboard, mouse, foreground, and hotkey work goes through the types below.
+
+## What this app already calls
+
+`InputSimulator("vermintide2_dx12.exe")`, `Send`, `TryParse`, `IsActiveWindow()`, `GetWindowPos(null)`, `GetWindowProcessName()`, `MouseGetPos()`, `GetKeyState`. `GlobalHotKeyManager` with `RunMessageLoop = true`, then `Start`, `Register(id, Func<Task>, key)`, `Change(id, key)`, `Dispose`.
+
+## InputSimulator (`Poss.Win.Automation.Input`)
+
+`new InputSimulator()` sends always. `new InputSimulator(params string[] processOrTitle)` sends only while the foreground window matches any filter.
+
+These no-op when a filter is set and the foreground does not match: `Send(string)`, `Send(KeyStroke)`, `SendText`, `Click`, `MouseWheel`, `MouseSetPos`, `MouseDeltaMove`, `SetCapsLock`, `SetNumLock`.
+
+These always run: `GetKeyState`, `MouseGetPos`, `GetWindowPos`, `GetWindowTitle`, `GetWindowClass`, `GetWindowPID`, `GetWindowProcessName`, `IsActiveWindow`, `WinActivate`. `BlockInput(bool)` is static and ignores the filter. `IsActiveWindow()` with no constructor filter returns false.
+
+| Call | Behavior |
+|---|---|
+| `Send("A")` / `Send("A Down")` / `Send(KeyStroke)` | Key or mouse. Unknown key throws. Blank is ignored. |
+| `SendText(string)` | Unicode, no keycodes. |
+| `Click(x, y, button = "LButton", count = 1)` | Moves, then clicks. Buttons: `LButton`, `RButton`, `MButton`, `XButton1`, `XButton2`. |
+| `MouseWheel(delta)` | Positive is up. One notch is 120. |
+| `MouseSetPos(x, y)` / `MouseGetPos()` | Screen point. Result is `POINT` (`x`, `y`). |
+| `MouseDeltaMove(x, y, speed = 1)` | Eased move. Blocks the caller. |
+| `GetKeyState("F5")` | Down when the high bit of async state is set. Unknown name is false. |
+| `GetWindowPos(hWnd?)` | `RECT?` (`Left`, `Top`, `Right`, `Bottom`). Null handle means foreground. |
+| `GetWindowTitle` / `GetWindowClass` | Same null-handle rule. |
+| `GetWindowPID()` / `GetWindowProcessName()` | Foreground only. Name is `Process.ProcessName` (no `.exe`). |
+| `IsActiveWindow(query)` / `IsActiveWindow()` | One query, or the constructor filters. |
+| `WinActivate(query)` | First matching window. Empty query returns false. |
+| `TryParse(string, out KeyStroke)` | Static. Same parse as `KeyStroke.TryParse`, cached. |
+
+Filter string: `"exe notepad"` or anything containing `.exe` is a process filter. The `.exe` suffix is stripped, then compared to `Process.ProcessName` with ordinal, case-sensitive equality. Any other string is a window-title substring, also ordinal. `vermintide2_dx12.exe` is the process. `vermintide2_dx12` is a title.
+
+## Keys (`Poss.Win.Automation.Common`)
+
+`KeyStroke.TryParse`, `TryParseKey` (name only), `TryGetVirtualKeyCode`. `new KeyStroke(VirtualKey, KeyAction = Press)` or `new KeyStroke(string)` (throws). `KeyAction` is `Press`, `Down`, `Up`.
+
+A stroke is one key, optional action, separated by space: `"A"`, `"Ctrl Down"`, `"LButton Up"`. `Press` and `Click` both mean press. A chord uses `+` in `HotkeyCombination`, not a space. `"0"`–`"9"` are `D0`–`D9` (`"1"` is `D1`, not `LButton`). A multi-digit string such as `"17"` fails. Names are `VirtualKey` names, case-insensitive. Same codes: `Ctrl`/`Control`, `Esc`/`Escape`, `Win`/`LWin`, `Left`/`ArrowLeft`, `Up`/`ArrowUp`, `Right`/`ArrowRight`, `Down`/`ArrowDown`. The token `Down` alone is the arrow. `"A Down"` is the A key with action down. Symbol literals: `; = , - . / \`` `[ \ ] '`.
+
+## Hotkeys (`Poss.Win.Automation.GlobalHotKeys`)
+
+Use `GlobalHotKeyManager`. `Start` / `Stop` / `Dispose` / `IsRunning`. `RunMessageLoop = true` starts a thread with a message loop. Register with `Func<Task>` plus strokes or a string. Overloads take an id or assign one. `RegisterAsync` returns the id immediately. `Unregister`, `Change(id, strokes|string|Func<Task>)`, `GetRegisteredHotkeys()` returns `HotkeyBinding` (`Id`, `Combination`) with no callback. `HotkeyCombination.TryParse` / `Parse` for `"Ctrl + S"` and `"Shift + LButton Up"`. An `Up` stroke fires on release.

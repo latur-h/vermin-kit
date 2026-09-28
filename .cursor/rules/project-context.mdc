@@ -1,0 +1,43 @@
+---
+description: Project map for Vermin Kit so agents can skip a full tree read
+alwaysApply: true
+---
+
+# Vermin Kit
+
+Windows tray app that holds a tag key in Vermintide 2 while that game is focused. .NET 10 WinForms (`net10.0-windows`), namespace `VerminKit`, nullable on. One package: `Poss.Win.Automation` 1.0.5. Its public API is mapped in `poss-win-automation.mdc`. No README, solution, or tests. DPI mode is `DpiUnaware`.
+
+## Files
+
+- `Program.cs` — mutex `Local\VerminKit`, then `Application.Run(new TrayApplication())`. Abandoned mutex counts as owned. Second instance exits.
+- `App/TrayApplication.cs` — tray icon, hotkeys, tag loop, 100 ms placement timer.
+- `Settings/TagSettings.cs` — locked snapshot and setters. `TagSnapshot` is the read model.
+- `Settings/TagConfigStore.cs` — JSON load/save.
+- `Settings/TagKeyHelper.cs` — normalize keys, `"Key Down"` / `"Key Up"` strokes, which key to capture.
+- `Overlays/OverlayForm.cs` — borderless topmost no-activate base. `NoFocusButton` lives here.
+- `Overlays/StatusOverlayForm.cs` — `Off  {key}` / `On  {key}` chip. Hit-testing is transparent.
+- `Overlays/SettingsOverlayForm.cs` — editor. Drag raises `DragStart`.
+- `Overlays/OverlayPlacement.cs` — clamp, top-center default, legacy anchors, editor beside the chip.
+
+## Runtime
+
+Target process is `vermintide2_dx12.exe`. Hotkeys run only when that window is active.
+
+- Activate starts the tag loop: key down, wait `keyGapMs`, key up, wait `tagDelayMs`, repeat. Deactivate clears the flag. A held key is released on stop or cancel.
+- Edit is fixed `F5` and toggles the settings overlay. It cannot be assigned as a tag or hotkey.
+- Hotkey ids are `"activate"`, `"deactivate"`, `"edit"`. Changing activate/deactivate calls `hotkeys.Change`.
+- The timer tracks the game rect. Both overlays hide unless the game is foreground or this process is. Bounds under 50 px, or left/top below -1000, are ignored. While dragging, the timer is 16 ms; on release it saves the status offset and returns to 100 ms.
+- Status text shows the key that does the next action: activate key when off, deactivate key when on.
+
+## Config
+
+`%LocalAppData%\Vermin Kit\config.json`, camelCase, indented. If missing, migrate from `%LocalAppData%\Vermintide 2\config.json` and rewrite the new path. Fields: `key`, `tagDelayMs`, `keyGapMs`, `x`, `y`, `activateKey`, `deactivateKey`, `anchor`.
+
+Defaults: tag key `XButton1`, tag delay 300, key gap 10, activate `F1`, deactivate `F2`, no offset. No offset means top-center, or a legacy `anchor` (`TopLeft` … `BottomRight`) until the user drags. Delays clamp to 10–60000. Activate and deactivate cannot match. Writes use `config.json.tmp` then move. IO and JSON errors are swallowed.
+
+## Do not break
+
+- Overlays must not take focus: `WS_EX_NOACTIVATE`, `ShowWithoutActivation`, `WM_MOUSEACTIVATE` → `MA_NOACTIVATE`. Status `WM_NCHITTEST` returns `HTTRANSPARENT`.
+- Settings mutations go through `TagSettings` and save immediately. Read state with `Snapshot()`.
+- Placement stays inside the game window with a 12 px margin (`OverlayPlacement.Margin`). Editor sits 8 px under the chip, or above if it would not fit.
+- Key capture waits for keys already down to release, then picks the first non-modifier (`TagKeyHelper.Pick`). Timeout is 5 seconds.
