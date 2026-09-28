@@ -2,6 +2,8 @@ namespace VerminKit;
 
 sealed record NoteSpan(int Start, int Length, bool Closed, string Weapon, string[] Properties, string Trait);
 
+sealed record BoldMark(int Start, int Length, bool Closed);
+
 sealed record NoteToken(int Start, int Length, string Part, string Query, NoteSpan Span);
 
 static class NoteMarkup
@@ -29,6 +31,39 @@ static class NoteMarkup
         }
 
         return spans;
+    }
+
+    public static IReadOnlyList<BoldMark> FindBold(string text)
+    {
+        var marks = new List<BoldMark>();
+        var index = 0;
+        while (index < text.Length)
+        {
+            var open = text.IndexOf('*', index);
+            if (open < 0)
+                break;
+
+            var lineEnd = text.IndexOf('\n', open + 1);
+            var limit = lineEnd < 0 ? text.Length : lineEnd;
+            var close = open + 1 < limit ? text.IndexOf('*', open + 1, limit - (open + 1)) : -1;
+            if (close < 0)
+            {
+                marks.Add(new BoldMark(open, Math.Max(1, limit - open), false));
+                index = open + Math.Max(1, limit - open);
+                continue;
+            }
+
+            if (close == open + 1)
+            {
+                index = close;
+                continue;
+            }
+
+            marks.Add(new BoldMark(open, close + 1 - open, true));
+            index = close + 1;
+        }
+
+        return marks;
     }
 
     public static NoteSpan? SpanAt(string text, int index)

@@ -17,6 +17,7 @@ sealed class NotesEditor : UserControl
     static readonly Color Ink = KitLook.Ink;
     static readonly Color CardInk = KitLook.CardInk;
     static readonly Color Frame = KitLook.Frame;
+    static readonly Font BoldFace = new(KitLook.Notes, FontStyle.Bold);
 
     readonly NotePad box = new()
     {
@@ -45,9 +46,11 @@ sealed class NotesEditor : UserControl
     int[] paragraphLevels = [];
     string styledText = "";
     List<NoteSpan> styledSpans = [];
+    List<BoldMark> styledBold = [];
     List<(int Start, int Length)> paintedSlices = [];
     int styledCaret;
     Color caretTint;
+    bool caretBold;
     int undoHold;
     ITextDocument? undoDocument;
     List<int>? pendingLevels;
@@ -310,11 +313,13 @@ sealed class NotesEditor : UserControl
         var caret = box.SelectionStart;
         var length = box.SelectionLength;
         var spans = new List<NoteSpan>(NoteMarkup.Find(text));
+        var bold = new List<BoldMark>(NoteMarkup.FindBold(text));
         var (editAt, removed, added) = Diff(styledText, text);
-        if (FormattingHolds(spans, editAt, added - removed, caret))
+        if (FormattingHolds(spans, bold, editAt, added - removed, caret))
         {
             styledText = text;
             styledSpans = spans;
+            styledBold = bold;
             styledCaret = caret;
             if (slices.Count == 0)
             {
@@ -342,19 +347,22 @@ sealed class NotesEditor : UserControl
         HoldUndo();
         try
         {
-            Restyle(text, spans, caret, editAt, removed, added);
+            Restyle(text, spans, bold, caret, editAt, removed, added);
             PaintSlices();
             var keep = slices.Count > 0 ? 0 : length;
             var pos = Math.Clamp(caret, 0, box.TextLength);
             box.Select(pos, 0);
             var inside = NoteMarkup.SpanAt(text, pos) is not null;
             box.SelectionColor = inside ? CardInk : Ink;
+            box.SelectionFont = InsideBold(bold, pos) ? BoldFace : Font;
             caretTint = inside ? CardInk : Ink;
+            caretBold = InsideBold(bold, pos);
             box.Select(pos, Math.Clamp(keep, 0, Math.Max(0, box.TextLength - pos)));
             if (ScrollPoint() != scroll)
                 SetScrollPoint(scroll);
             styledText = text;
             styledSpans = spans;
+            styledBold = bold;
             styledCaret = caret;
         }
         finally
@@ -364,7 +372,30 @@ sealed class NotesEditor : UserControl
         }
     }
 
-    bool FormattingHolds(List<NoteSpan> spans, int editAt, int delta, int caret)
+    bool FormattingHolds(List<NoteSpan> spans, List<BoldMark> bold, int editAt, int delta, int caret)
+    {
+        if (!RangesHold(spans, editAt, delta, caret))
+            return false;
+        if (bold.Count != styledBold.Count)
+            return false;
+
+        for (var index = 0; index < bold.Count; index++)
+        {
+            var old = styledBold[index];
+            var next = bold[index];
+            var shift = old.Start >= editAt ? delta : 0;
+            if (next.Start != old.Start + shift || next.Length != old.Length || next.Closed != old.Closed)
+                return false;
+            if (InsideRange(next.Start, next.Length, caret) != InsideRange(old.Start, old.Length, styledCaret))
+                return false;
+            if (editAt > old.Start && editAt < old.Start + old.Length)
+                return false;
+        }
+
+        return true;
+    }
+
+    bool RangesHold(List<NoteSpan> spans, int editAt, int delta, int caret)
     {
         if (spans.Count != styledSpans.Count)
             return false;
@@ -385,7 +416,7 @@ sealed class NotesEditor : UserControl
         return true;
     }
 
-    void Restyle(string text, List<NoteSpan> spans, int caret, int editAt, int removed, int added)
+    void Restyle(string text, List<NoteSpan> spans, List<BoldMark> bold, int caret, int editAt, int removed, int added)
     {
         var dirtyStart = editAt;
         var dirtyEnd = editAt + Math.Max(added, removed);
@@ -393,11 +424,15 @@ sealed class NotesEditor : UserControl
         {
             var span = spans[index];
             var flipped = index < styledSpans.Count && InsideSpan(span, caret) != InsideSpan(styledSpans[index], styledCaret);
-            var overlaps = span.Start < dirtyEnd && span.Start + span.Length > dirtyStart;
-            if (!flipped && !overlaps)
-                continue;
-            dirtyStart = Math.Min(dirtyStart, span.Start);
-            dirtyEnd = Math.Max(dirtyEnd, span.Start + span.Length);
+            Cover(span.Start, span.Length, flipped, ref dirtyStart, ref dirtyEnd);
+        }
+
+        for (var index = 0; index < bold.Count; index++)
+        {
+            var mark = bold[index];
+            var flipped = index < styledBold.Count
+                && InsideRange(mark.Start, mark.Length, caret) != InsideRange(styledBold[index].Start, styledBold[index].Length, styledCaret);
+            Cover(mark.Start, mark.Length, flipped, ref dirtyStart, ref dirtyEnd);
         }
 
         dirtyStart = Math.Clamp(dirtyStart, 0, text.Length);
@@ -407,6 +442,7 @@ sealed class NotesEditor : UserControl
             box.Select(dirtyStart, dirtyEnd - dirtyStart);
             box.SelectionColor = Ink;
             box.SelectionBackColor = Paper;
+            box.SelectionFont = Font;
             SetHidden(false);
         }
 
@@ -417,6 +453,24 @@ sealed class NotesEditor : UserControl
             if (span.Start >= dirtyEnd || span.Start + span.Length <= dirtyStart)
                 continue;
             PaintSpan(text, span, caret);
+        }
+
+        foreach (var mark in bold)
+        {
+            if (mark.Length < 1 || mark.Start >= text.Length)
+                continue;
+            if (mark.Start >= dirtyEnd || mark.Start + mark.Length <= dirtyStart)
+                continue;
+            PaintBold(mark, caret);
+        }
+
+        static void Cover(int start, int length, bool flipped, ref int dirtyStart, ref int dirtyEnd)
+        {
+            var overlaps = start < dirtyEnd && start + length > dirtyStart;
+            if (!flipped && !overlaps)
+                return;
+            dirtyStart = Math.Min(dirtyStart, start);
+            dirtyEnd = Math.Max(dirtyEnd, start + length);
         }
     }
 
@@ -457,6 +511,36 @@ sealed class NotesEditor : UserControl
         }
     }
 
+    void PaintBold(BoldMark mark, int caret)
+    {
+        var take = Math.Min(mark.Length, box.TextLength - mark.Start);
+        if (take < 3 || !mark.Closed)
+            return;
+
+        var editing = InsideRange(mark.Start, mark.Length, caret);
+        if (editing)
+        {
+            box.Select(mark.Start, 1);
+            box.SelectionFont = Font;
+            SetHidden(false);
+            box.Select(mark.Start + 1, take - 2);
+            box.SelectionFont = BoldFace;
+            SetHidden(false);
+            box.Select(mark.Start + take - 1, 1);
+            box.SelectionFont = Font;
+            SetHidden(false);
+            return;
+        }
+
+        box.Select(mark.Start, 1);
+        SetHidden(true);
+        box.Select(mark.Start + 1, take - 2);
+        box.SelectionFont = BoldFace;
+        SetHidden(false);
+        box.Select(mark.Start + take - 1, 1);
+        SetHidden(true);
+    }
+
     void PaintSlices()
     {
         foreach (var slice in paintedSlices)
@@ -481,19 +565,36 @@ sealed class NotesEditor : UserControl
         if (box.SelectionLength > 0)
             return;
         var color = NoteMarkup.SpanAt(text, caret) is not null ? CardInk : Ink;
-        if (color == caretTint)
+        var bold = InsideBold(NoteMarkup.FindBold(text), caret);
+        if (color == caretTint && bold == caretBold)
             return;
 
         painting = true;
         HoldUndo();
         box.SelectionColor = color;
+        box.SelectionFont = bold ? BoldFace : Font;
         ReleaseUndo();
         painting = false;
         caretTint = color;
+        caretBold = bold;
+    }
+
+    static bool InsideBold(IReadOnlyList<BoldMark> marks, int caret)
+    {
+        foreach (var mark in marks)
+        {
+            if (mark.Closed && InsideRange(mark.Start, mark.Length - 1, caret))
+                return true;
+        }
+
+        return false;
     }
 
     static bool InsideSpan(NoteSpan span, int caret) =>
-        caret > span.Start && caret < span.Start + span.Length;
+        InsideRange(span.Start, span.Length, caret);
+
+    static bool InsideRange(int start, int length, int caret) =>
+        caret > start && caret < start + length;
 
     static (int At, int Removed, int Added) Diff(string before, string after)
     {
@@ -1014,19 +1115,31 @@ sealed class NotesEditor : UserControl
     {
         var text = box.Text;
         var caret = box.SelectionStart;
-        var inside = false;
+        var at = -1;
         foreach (var span in NoteMarkup.Find(text))
         {
             if (span.Closed && caret > span.Start && caret < span.Start + span.Length)
             {
-                inside = true;
+                at = span.Start;
                 break;
             }
         }
 
-        if (inside == reveal)
+        if (at < 0)
+        {
+            foreach (var mark in NoteMarkup.FindBold(text))
+            {
+                if (mark.Closed && caret > mark.Start && caret < mark.Start + mark.Length)
+                {
+                    at = mark.Start;
+                    break;
+                }
+            }
+        }
+
+        if (at == revealAt)
             return false;
-        reveal = inside;
+        revealAt = at;
         return true;
     }
 
@@ -1144,7 +1257,7 @@ sealed class NotesEditor : UserControl
         return index;
     }
 
-    bool reveal;
+    int revealAt = -1;
 
     const int EM_SETCHARFORMAT = 0x0444;
     const int SCF_SELECTION = 1;
