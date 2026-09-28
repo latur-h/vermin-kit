@@ -377,7 +377,8 @@ sealed class NotesOverlayForm : OverlayForm
             var propertyB = book.Catalog.FindProperty(pool, gear?.PropertyB);
             var lineA = propertyA?.Line ?? "Choose property";
             var lineB = propertyB?.Line ?? "Choose property";
-            card.ShowCopy(card.HasWeapon && weapon is not null ? NoteToken(weapon, propertyA, propertyB, trait) : "");
+            var itemName = card.HasWeapon ? weapon?.Name : card.SlotTitle;
+            card.ShowCopy(itemName is null ? "" : ItemMarkup(itemName, propertyA, propertyB, trait));
             card.ShowItem(
                 enabled,
                 card.HasWeapon ? weapon?.Name ?? "Choose weapon" : card.SlotTitle,
@@ -530,7 +531,7 @@ sealed class NotesOverlayForm : OverlayForm
         pickerField = token.Part;
         pickerCaption.Text = token.Part switch
         {
-            "weapon" => "Weapons",
+            "weapon" => "Items",
             "trait" => "Traits",
             _ => "Properties"
         };
@@ -684,17 +685,23 @@ sealed class NotesOverlayForm : OverlayForm
         {
             foreach (var match in Rank(weapons, token.Query, static item => item.Name))
                 list.Add(new PickChoice(match.Id, match.Name, match.Keywords));
+            foreach (var (id, title) in Rank(Jewelry, token.Query, static item => item.Name))
+                list.Add(new PickChoice(id, title, null));
             return list;
         }
 
-        var weapon = weapons.FirstOrDefault(item =>
-            item.Name.Equals(token.Span.Weapon, StringComparison.OrdinalIgnoreCase));
-        if (weapon is null)
+        var slot = JewelryId(token.Span.Weapon);
+        var weapon = slot is null
+            ? weapons.FirstOrDefault(item => item.Name.Equals(token.Span.Weapon, StringComparison.OrdinalIgnoreCase))
+            : null;
+        var traitGroup = slot ?? weapon?.Traits;
+        var propertyPool = slot ?? weapon?.Properties;
+        if (traitGroup is null || propertyPool is null)
             return list;
 
         if (token.Part == "trait")
         {
-            foreach (var trait in Rank(book.Catalog.Traits(weapon.Traits), token.Query, static item => item.Name))
+            foreach (var trait in Rank(book.Catalog.Traits(traitGroup), token.Query, static item => item.Name))
                 list.Add(new PickChoice(trait.Id, trait.Name, trait.Description));
             return list;
         }
@@ -702,7 +709,7 @@ sealed class NotesOverlayForm : OverlayForm
         var used = new HashSet<string>(
             token.Span.Properties.Where(name => !name.Equals(token.Query, StringComparison.OrdinalIgnoreCase)),
             StringComparer.OrdinalIgnoreCase);
-        var properties = book.Catalog.Properties(weapon.Properties)
+        var properties = book.Catalog.Properties(propertyPool)
             .Where(item => !used.Contains(item.Name))
             .Where(item => token.Query.Length == 0
                 || item.Name.Contains(token.Query, StringComparison.OrdinalIgnoreCase)
@@ -717,12 +724,16 @@ sealed class NotesOverlayForm : OverlayForm
     bool TryResolve(NoteSpan span, out ResolvedNote resolved)
     {
         resolved = null!;
-        var weapon = CareerWeapons().FirstOrDefault(item =>
-            item.Name.Equals(span.Weapon, StringComparison.OrdinalIgnoreCase));
-        if (weapon is null)
+        var slot = JewelryId(span.Weapon);
+        var weapon = slot is null
+            ? CareerWeapons().FirstOrDefault(item => item.Name.Equals(span.Weapon, StringComparison.OrdinalIgnoreCase))
+            : null;
+        var propertyPool = slot ?? weapon?.Properties;
+        var traitGroup = slot ?? weapon?.Traits;
+        if (propertyPool is null || traitGroup is null)
             return false;
 
-        var pool = book.Catalog.Properties(weapon.Properties);
+        var pool = book.Catalog.Properties(propertyPool);
         var matched = new List<PropertyInfo>();
         foreach (var name in span.Properties)
         {
@@ -736,10 +747,16 @@ sealed class NotesOverlayForm : OverlayForm
                 break;
         }
 
-        var trait = book.Catalog.Traits(weapon.Traits).FirstOrDefault(item =>
+        var trait = book.Catalog.Traits(traitGroup).FirstOrDefault(item =>
             item.Name.Equals(span.Trait, StringComparison.OrdinalIgnoreCase));
+        var title = slot is null ? weapon!.Name : JewelryTitle(slot);
         resolved = new ResolvedNote(
-            weapon,
+            title,
+            slot is null ? WeaponSubtitle(weapon!) : title,
+            slot is null ? weapon!.Keywords : "",
+            weapon?.Id,
+            slot,
+            slot is null ? ResourceLabel(weapon) : "",
             matched.Count > 0 ? matched[0] : null,
             matched.Count > 1 ? matched[1] : null,
             trait);
@@ -790,10 +807,11 @@ sealed class NotesOverlayForm : OverlayForm
             return;
 
         hoverStart = span.Start;
-        hoverCard.SetSubtitle(resolved.Weapon.Traits is "ammo" or "heat" or "energy" ? "Ranged" : "Melee");
+        hoverCard.SetSubtitle(resolved.Subtitle);
+        var mark = resolved.WeaponId is not null ? icons.Weapon(resolved.WeaponId) : SlotIcon(resolved.Slot ?? "");
         hoverCard.ShowItem(
             true,
-            resolved.Weapon.Name,
+            resolved.Title,
             resolved.A?.Line ?? "",
             resolved.B?.Line ?? "",
             resolved.A is not null,
@@ -801,10 +819,10 @@ sealed class NotesOverlayForm : OverlayForm
             resolved.Trait?.Name ?? "",
             resolved.Trait?.Description ?? "",
             resolved.Trait is not null,
-            resolved.Weapon.Keywords,
-            icons.Weapon(resolved.Weapon.Id),
+            resolved.Keywords,
+            mark,
             icons.Trait(resolved.Trait?.Id),
-            ResourceLabel(resolved.Weapon),
+            resolved.Resource,
             true);
         var cursor = Cursor.Position;
         var screen = Screen.FromPoint(cursor).WorkingArea;
@@ -1135,9 +1153,41 @@ sealed class NotesOverlayForm : OverlayForm
             height);
     }
 
-    static string NoteToken(WeaponInfo weapon, PropertyInfo? first, PropertyInfo? second, TraitInfo? trait)
+    static readonly (string Id, string Name)[] Jewelry =
+    [
+        ("necklace", "Necklace"),
+        ("charm", "Charm"),
+        ("trinket", "Trinket")
+    ];
+
+    static string? JewelryId(string name)
     {
-        var text = weapon.Name;
+        foreach (var (id, title) in Jewelry)
+        {
+            if (title.Equals(name, StringComparison.OrdinalIgnoreCase))
+                return id;
+        }
+
+        return null;
+    }
+
+    static string JewelryTitle(string slot)
+    {
+        foreach (var (id, title) in Jewelry)
+        {
+            if (id == slot)
+                return title;
+        }
+
+        return slot;
+    }
+
+    static string WeaponSubtitle(WeaponInfo weapon) =>
+        weapon.Traits is "ammo" or "heat" or "energy" ? "Ranged" : "Melee";
+
+    static string ItemMarkup(string name, PropertyInfo? first, PropertyInfo? second, TraitInfo? trait)
+    {
+        var text = name;
         var properties = new List<string>(2);
         if (first is not null)
             properties.Add(first.Name);
@@ -1158,7 +1208,16 @@ sealed class NotesOverlayForm : OverlayForm
         public override string ToString() => Label;
     }
 
-    sealed record ResolvedNote(WeaponInfo Weapon, PropertyInfo? A, PropertyInfo? B, TraitInfo? Trait);
+    sealed record ResolvedNote(
+        string Title,
+        string Subtitle,
+        string Keywords,
+        string? WeaponId,
+        string? Slot,
+        string Resource,
+        PropertyInfo? A,
+        PropertyInfo? B,
+        TraitInfo? Trait);
 
     sealed class CardPop : Form
     {
