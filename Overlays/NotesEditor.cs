@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace VerminKit;
 
@@ -14,11 +15,11 @@ sealed class NotesEditor : UserControl
     static readonly Color CardInk = KitLook.CardInk;
     static readonly Color Frame = KitLook.Frame;
 
-    readonly RichTextBox box = new()
+    readonly NotePad box = new()
     {
         BorderStyle = BorderStyle.None,
         Multiline = true,
-        AcceptsTab = false,
+        AcceptsTab = true,
         DetectUrls = false,
         ScrollBars = RichTextBoxScrollBars.None,
         MaxLength = 4000,
@@ -28,10 +29,17 @@ sealed class NotesEditor : UserControl
         HideSelection = false
     };
     readonly GoldScrollBar bar = new();
+    readonly List<(int Start, int Length)> slices = [];
 
     bool painting;
     bool barSync;
+    bool rectActive;
     int hoverIndex = -2;
+    int indentStep;
+    int charWidth;
+    Point rectAnchor;
+    Point rectFocus;
+    List<int>? pendingLevels;
 
     public NotesEditor()
     {
@@ -46,6 +54,8 @@ sealed class NotesEditor : UserControl
         {
             if (painting)
                 return;
+            slices.Clear();
+            rectActive = false;
             Colorize();
             NotesChanged?.Invoke(this, EventArgs.Empty);
             SyncBar();
@@ -58,22 +68,42 @@ sealed class NotesEditor : UserControl
                 Colorize();
             CaretMoved?.Invoke(this, EventArgs.Empty);
         };
+        box.MouseDown += (_, args) =>
+        {
+            if (args.Button == MouseButtons.Left)
+                ClearRect();
+        };
         box.MouseMove += (_, args) => Hit(args.Location);
         box.MouseLeave += (_, _) => ClearHover();
         box.MouseWheel += (_, args) => OnWheel(args);
-        box.KeyDown += (_, args) =>
+        box.KeyDown += (_, args) => OnBoxKey(args);
+        box.RectStart += (_, args) =>
         {
-            if (args.KeyCode != Keys.Escape)
-                return;
-            EscapePressed?.Invoke(this, EventArgs.Empty);
-            args.Handled = true;
-            args.SuppressKeyPress = true;
+            rectAnchor = args.Location;
+            rectFocus = args.Location;
+            rectActive = true;
+            slices.Clear();
+        };
+        box.RectMove += (_, args) =>
+        {
+            rectFocus = args.Location;
+            RebuildSlices();
+            Colorize();
+        };
+        box.RectEnd += (_, args) =>
+        {
+            rectFocus = args.Location;
+            RebuildSlices();
+            rectActive = slices.Count > 0;
+            Colorize();
         };
     }
 
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
+        if (pendingLevels is not null)
+            ApplyLevels(pendingLevels);
         Colorize();
         SyncBar();
     }
@@ -107,12 +137,90 @@ sealed class NotesEditor : UserControl
                 return;
             }
 
-            painting = true;
-            box.Text = next;
-            painting = false;
-            Colorize();
-            SyncBar();
+            Import(next);
         }
+    }
+
+    public string Export()
+    {
+        var text = Notes;
+        if (!box.IsHandleCreated)
+            return text;
+
+        painting = true;
+        var caret = box.SelectionStart;
+        var length = box.SelectionLength;
+        var scroll = ScrollPoint();
+        try
+        {
+            var step = IndentStep();
+            var result = new StringBuilder();
+            var index = 0;
+            while (true)
+            {
+                var end = text.IndexOf('\n', index);
+                if (end < 0)
+                    end = text.Length;
+                box.Select(Math.Min(index, box.TextLength), 0);
+                var level = box.SelectionIndent <= 0 ? 0 : (box.SelectionIndent + step / 2) / step;
+                result.Append('\t', level);
+                result.Append(text, index, end - index);
+                if (end >= text.Length)
+                    break;
+                result.Append('\n');
+                index = end + 1;
+            }
+
+            box.Select(Math.Clamp(caret, 0, box.TextLength), Math.Clamp(length, 0, Math.Max(0, box.TextLength - caret)));
+            if (ScrollPoint() != scroll)
+                SetScrollPoint(scroll);
+            return result.ToString();
+        }
+        finally
+        {
+            painting = false;
+        }
+    }
+
+    public void Import(string? value)
+    {
+        var stored = (value ?? "").Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
+        if (box.IsHandleCreated && Export() == stored)
+        {
+            Colorize();
+            return;
+        }
+
+        var plain = new StringBuilder();
+        var levels = new List<int>();
+        var index = 0;
+        while (true)
+        {
+            var end = stored.IndexOf('\n', index);
+            if (end < 0)
+                end = stored.Length;
+            var at = index;
+            var level = 0;
+            while (at < end && stored[at] == '\t')
+            {
+                level++;
+                at++;
+            }
+
+            levels.Add(level);
+            plain.Append(stored, at, end - at);
+            if (end >= stored.Length)
+                break;
+            plain.Append('\n');
+            index = end + 1;
+        }
+
+        painting = true;
+        box.Text = plain.ToString();
+        painting = false;
+        ApplyLevels(levels);
+        Colorize();
+        SyncBar();
     }
 
     public void SetEditable(bool value)
@@ -238,10 +346,23 @@ sealed class NotesEditor : UserControl
                 }
             }
 
+            box.SelectAll();
+            box.SelectionBackColor = Paper;
+            foreach (var slice in slices)
+            {
+                var start = Math.Clamp(slice.Start, 0, box.TextLength);
+                var take = Math.Clamp(slice.Length, 0, box.TextLength - start);
+                if (take < 1)
+                    continue;
+                box.Select(start, take);
+                box.SelectionBackColor = KitLook.PickSelected;
+            }
+
+            var keep = slices.Count > 0 ? 0 : length;
             box.Select(Math.Clamp(caret, 0, box.TextLength), 0);
-            var inside = NoteMarkup.SpanAt(box.Text, caret) is not null && (length > 0 || caret < box.TextLength);
+            var inside = NoteMarkup.SpanAt(box.Text, caret) is not null && (keep > 0 || caret < box.TextLength);
             box.SelectionColor = inside ? CardInk : Ink;
-            box.Select(Math.Clamp(caret, 0, box.TextLength), length);
+            box.Select(Math.Clamp(caret, 0, box.TextLength), keep);
             if (ScrollPoint() != scroll)
                 SetScrollPoint(scroll);
         }
@@ -253,6 +374,262 @@ sealed class NotesEditor : UserControl
         }
 
         bool Inside(NoteSpan span) => caret > span.Start && caret < span.Start + span.Length;
+    }
+
+    void OnBoxKey(KeyEventArgs args)
+    {
+        if (args.KeyCode == Keys.Escape)
+        {
+            ClearRect();
+            EscapePressed?.Invoke(this, EventArgs.Empty);
+            args.Handled = true;
+            args.SuppressKeyPress = true;
+            return;
+        }
+
+        if (args.KeyCode == Keys.Tab)
+        {
+            ShiftIndent(args.Shift ? -1 : 1);
+            args.Handled = true;
+            args.SuppressKeyPress = true;
+            return;
+        }
+
+        if (args.Shift && args.Alt && args.KeyCode is Keys.Left or Keys.Right or Keys.Up or Keys.Down)
+        {
+            NudgeRect(args.KeyCode);
+            args.Handled = true;
+            args.SuppressKeyPress = true;
+            return;
+        }
+
+        if (slices.Count > 0 && args.Control && args.KeyCode == Keys.C)
+        {
+            CopyRect();
+            args.Handled = true;
+            args.SuppressKeyPress = true;
+        }
+    }
+
+    void ShiftIndent(int direction)
+    {
+        if (box.ReadOnly)
+            return;
+
+        var step = IndentStep();
+        var start = box.SelectionStart;
+        var length = box.SelectionLength;
+        var targets = new List<int>();
+        if (slices.Count > 0)
+        {
+            foreach (var slice in slices)
+                targets.Add(ParagraphStart(slice.Start));
+        }
+        else
+        {
+            var from = ParagraphStart(start);
+            var last = Math.Max(start, start + Math.Max(0, length) - (length > 0 ? 1 : 0));
+            for (var at = from; at <= ParagraphStart(last);)
+            {
+                targets.Add(at);
+                var end = ParagraphEnd(at);
+                if (end >= box.TextLength)
+                    break;
+                at = end + 1;
+            }
+        }
+
+        painting = true;
+        var scroll = ScrollPoint();
+        try
+        {
+            var seen = new HashSet<int>();
+            foreach (var at in targets)
+            {
+                if (!seen.Add(at) || at > box.TextLength)
+                    continue;
+                box.Select(at, 0);
+                var level = box.SelectionIndent <= 0 ? 0 : (box.SelectionIndent + step / 2) / step;
+                box.SelectionIndent = Math.Max(0, level + direction) * step;
+                box.SelectionHangingIndent = 0;
+            }
+
+            box.Select(Math.Clamp(start, 0, box.TextLength), Math.Clamp(length, 0, Math.Max(0, box.TextLength - start)));
+            if (ScrollPoint() != scroll)
+                SetScrollPoint(scroll);
+        }
+        finally
+        {
+            painting = false;
+        }
+
+        NotesChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    void ApplyLevels(List<int> levels)
+    {
+        if (!box.IsHandleCreated)
+        {
+            pendingLevels = levels;
+            return;
+        }
+
+        pendingLevels = null;
+        painting = true;
+        var step = IndentStep();
+        var at = 0;
+        foreach (var level in levels)
+        {
+            if (at > box.TextLength)
+                break;
+            box.Select(at, 0);
+            box.SelectionIndent = Math.Max(0, level) * step;
+            box.SelectionHangingIndent = 0;
+            var end = ParagraphEnd(at);
+            if (end >= box.TextLength)
+                break;
+            at = end + 1;
+        }
+
+        box.Select(0, 0);
+        painting = false;
+    }
+
+    void NudgeRect(Keys key)
+    {
+        if (!rectActive)
+        {
+            rectAnchor = box.GetPositionFromCharIndex(Math.Clamp(box.SelectionStart, 0, Math.Max(0, box.TextLength)));
+            rectFocus = new Point(rectAnchor.X + CharWidth(), rectAnchor.Y + LineHeight);
+            rectActive = true;
+        }
+        else
+        {
+            var dx = key == Keys.Left ? -CharWidth() : key == Keys.Right ? CharWidth() : 0;
+            var dy = key == Keys.Up ? -LineHeight : key == Keys.Down ? LineHeight : 0;
+            rectFocus = new Point(rectFocus.X + dx, rectFocus.Y + dy);
+        }
+
+        RebuildSlices();
+        Colorize();
+    }
+
+    void RebuildSlices()
+    {
+        slices.Clear();
+        var left = Math.Min(rectAnchor.X, rectFocus.X);
+        var right = Math.Max(rectAnchor.X, rectFocus.X);
+        var top = Math.Min(rectAnchor.Y, rectFocus.Y);
+        var bottom = Math.Max(rectAnchor.Y, rectFocus.Y);
+        if (right - left < 2 && bottom - top < 2)
+            return;
+
+        var text = box.Text;
+        var band = Math.Max(8, LineHeight);
+        for (var y = top; y <= bottom; y += band)
+        {
+            var lineY = Math.Clamp(y + 1, 0, Math.Max(0, box.ClientSize.Height - 1));
+            var start = EdgeIndex(left, lineY);
+            var end = EdgeIndex(right, lineY);
+            if (end < start)
+                (start, end) = (end, start);
+            while (end > start && start < text.Length && text[end - 1] == '\n')
+                end--;
+            while (end > start && start < text.Length && text[start] == '\n')
+                start++;
+            if (end <= start)
+                continue;
+            if (slices.Count > 0 && start < slices[^1].Start + slices[^1].Length)
+                continue;
+            slices.Add((start, end - start));
+        }
+    }
+
+    int EdgeIndex(int x, int y)
+    {
+        var point = new Point(
+            Math.Clamp(x, 0, Math.Max(0, box.ClientSize.Width - 1)),
+            Math.Clamp(y, 0, Math.Max(0, box.ClientSize.Height - 1)));
+        var index = Math.Clamp(box.GetCharIndexFromPosition(point), 0, box.TextLength);
+        if (index >= box.TextLength)
+            return box.TextLength;
+
+        var origin = box.GetPositionFromCharIndex(index);
+        if (Math.Abs(origin.Y - point.Y) > LineHeight)
+            return index;
+
+        var next = index + 1 < box.TextLength ? box.GetPositionFromCharIndex(index + 1) : origin;
+        var rightEdge = next.X > origin.X ? next.X : origin.X + CharWidth();
+        if (point.X >= (origin.X + rightEdge) / 2)
+            return index + 1;
+        return index;
+    }
+
+    void ClearRect()
+    {
+        if (slices.Count == 0 && !rectActive)
+            return;
+        slices.Clear();
+        rectActive = false;
+        if (!painting)
+            Colorize();
+    }
+
+    void CopyRect()
+    {
+        var text = box.Text;
+        var lines = new List<string>();
+        foreach (var slice in slices)
+        {
+            var start = Math.Clamp(slice.Start, 0, text.Length);
+            var take = Math.Clamp(slice.Length, 0, text.Length - start);
+            if (take > 0)
+                lines.Add(text.Substring(start, take));
+        }
+
+        if (lines.Count == 0)
+            return;
+        try
+        {
+            Clipboard.SetText(string.Join("\n", lines));
+        }
+        catch (ExternalException)
+        {
+        }
+    }
+
+    int ParagraphStart(int index)
+    {
+        var text = box.Text;
+        index = Math.Clamp(index, 0, text.Length);
+        if (index == 0)
+            return 0;
+        var found = text.LastIndexOf('\n', index - 1);
+        return found < 0 ? 0 : found + 1;
+    }
+
+    int ParagraphEnd(int index)
+    {
+        var text = box.Text;
+        index = Math.Clamp(index, 0, text.Length);
+        var found = text.IndexOf('\n', index);
+        return found < 0 ? text.Length : found;
+    }
+
+    int IndentStep()
+    {
+        if (indentStep > 0)
+            return indentStep;
+        indentStep = Math.Max(16, TextRenderer.MeasureText("    ", box.Font, Size.Empty, TextFormatFlags.NoPadding).Width);
+        return indentStep;
+    }
+
+    int CharWidth()
+    {
+        if (charWidth > 0)
+            return charWidth;
+        charWidth = Math.Max(6, TextRenderer.MeasureText("n", box.Font, Size.Empty, TextFormatFlags.NoPadding).Width);
+        return charWidth;
     }
 
     bool CollapseChanged()
@@ -430,4 +807,59 @@ sealed class NotesEditor : UserControl
 
     [DllImport("user32.dll", EntryPoint = "SendMessageW")]
     static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, ref Point lParam);
+
+    sealed class NotePad : RichTextBox
+    {
+        public event MouseEventHandler? RectStart;
+
+        public event MouseEventHandler? RectMove;
+
+        public event MouseEventHandler? RectEnd;
+
+        bool tracking;
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_LBUTTONDOWN = 0x0201;
+            const int WM_MOUSEMOVE = 0x0200;
+            const int WM_LBUTTONUP = 0x0202;
+            if (m.Msg == WM_LBUTTONDOWN && BoxMods())
+            {
+                tracking = true;
+                Capture = true;
+                RectStart?.Invoke(this, MouseFrom(m));
+                return;
+            }
+
+            if (tracking && m.Msg == WM_MOUSEMOVE)
+            {
+                RectMove?.Invoke(this, MouseFrom(m));
+                return;
+            }
+
+            if (tracking && m.Msg == WM_LBUTTONUP)
+            {
+                tracking = false;
+                Capture = false;
+                RectEnd?.Invoke(this, MouseFrom(m));
+                return;
+            }
+
+            base.WndProc(ref m);
+        }
+
+        static bool BoxMods() =>
+            (ModifierKeys & (Keys.Shift | Keys.Alt)) == (Keys.Shift | Keys.Alt);
+
+        static MouseEventArgs MouseFrom(Message message)
+        {
+            var packed = unchecked((int)(nint)message.LParam);
+            return new MouseEventArgs(
+                MouseButtons.Left,
+                1,
+                (short)(packed & 0xFFFF),
+                (short)((packed >> 16) & 0xFFFF),
+                0);
+        }
+    }
 }

@@ -125,7 +125,7 @@ sealed class NotesOverlayForm : OverlayForm
         notesEditor.NotesChanged += (_, _) =>
         {
             if (!Suppressed)
-                book.SetNotes(notesEditor.Notes);
+                book.SetNotes(notesEditor.Export());
             UpdateNoteSuggest();
         };
         notesEditor.CaretMoved += (_, _) => UpdateNoteSuggest();
@@ -336,8 +336,8 @@ sealed class NotesOverlayForm : OverlayForm
             descriptions.Enabled = hasLoadout;
             nameBox.Text = book.Current?.Name ?? "";
             var notes = book.Current?.Notes ?? "";
-            if (notesEditor.Notes != notes)
-                notesEditor.Notes = notes;
+            if (notesEditor.Export() != notes)
+                notesEditor.Import(notes);
             RefreshCards();
             RefreshTalents();
         }
@@ -920,10 +920,11 @@ sealed class NotesOverlayForm : OverlayForm
             y += rowHeight + gap;
         }
 
-        notesCaption.SetBounds(x, y, inner, 22);
+        var notesWidth = Math.Max(240, inner * 3 / 4);
+        notesCaption.SetBounds(x, y, notesWidth, 22);
         y += 24;
         var notesHeight = Math.Max(360, viewHeight * 28 / 100);
-        notesEditor.SetBounds(x, y, inner, notesHeight);
+        notesEditor.SetBounds(x, y, notesWidth, notesHeight);
         return notesEditor.Bottom + pad;
     }
 
