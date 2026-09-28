@@ -37,6 +37,8 @@ sealed class LoadoutBook
         var career = catalog.FindCareer(file.CareerId) ?? catalog.Heroes[0].Careers[0];
         Career = career;
         Current = FindSelected(career.Id);
+        if (Current is null)
+            Create();
     }
 
     public GameCatalog Catalog => catalog;
@@ -67,6 +69,12 @@ sealed class LoadoutBook
 
         Career = career;
         Current = FindSelected(career.Id);
+        if (Current is null)
+        {
+            Create();
+            return;
+        }
+
         Save();
     }
 

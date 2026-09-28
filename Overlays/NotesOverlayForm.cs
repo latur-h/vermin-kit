@@ -1,9 +1,9 @@
+using System.Drawing.Drawing2D;
+
 namespace VerminKit;
 
 sealed class NotesOverlayForm : OverlayForm
 {
-    const int CardHeight = 188;
-
     static readonly Color PanelColor = Color.FromArgb(28, 28, 28);
     static readonly Color ButtonColor = Color.FromArgb(48, 48, 48);
     static readonly Color SelectedColor = Color.FromArgb(92, 48, 18);
@@ -16,10 +16,11 @@ sealed class NotesOverlayForm : OverlayForm
     readonly IconCatalog icons = new();
     readonly bool[] careerShown = new bool[4];
     readonly ToolTip tips = new() { InitialDelay = 300, AutoPopDelay = 30000, ShowAlways = true };
-    readonly Panel scroll = new() { Dock = DockStyle.Fill, AutoScroll = true };
+    readonly Image? backdrop;
+    readonly Panel scroll = new() { Dock = DockStyle.Fill, AutoScroll = false };
     readonly Button[] heroButtons;
     readonly Button[] careerButtons;
-    readonly ComboBox loadouts = new() { DropDownStyle = ComboBoxStyle.DropDownList };
+    readonly Button loadoutButton;
     readonly TextBox nameBox = new() { MaxLength = 80, BorderStyle = BorderStyle.FixedSingle };
     readonly TextBox notesBox = new()
     {
@@ -32,7 +33,7 @@ sealed class NotesOverlayForm : OverlayForm
     readonly Button createButton;
     readonly Button deleteButton;
     readonly CheckBox descriptions = new() { Text = "Show descriptions", AutoSize = true };
-    readonly CardUi[] cards;
+    readonly RedItemCard[] cards;
     readonly Button[,] talents = new Button[6, 3];
     readonly Label[] levels = new Label[6];
     readonly Label pickerCaption = new() { AutoSize = false, ForeColor = HintColor };
@@ -52,6 +53,9 @@ sealed class NotesOverlayForm : OverlayForm
     int suppress;
     bool layingOut;
     bool ready;
+    Size laidOutSize;
+    bool laidOutDescriptions;
+    bool laidOutReady;
 
     public event Action? CloseRequested;
 
@@ -61,7 +65,12 @@ sealed class NotesOverlayForm : OverlayForm
     {
         this.book = book;
         Text = "Notes";
-        scroll.BackColor = PanelColor;
+        DoubleBuffered = true;
+        backdrop = LoadBackdrop();
+        RedItemCard.Backdrop = backdrop;
+        scroll.BackColor = Color.FromArgb(18, 12, 8);
+        scroll.Paint += PaintBackdrop;
+        scroll.MouseDown += (_, _) => ClosePicker();
         Controls.Add(scroll);
 
         heroButtons = book.Catalog.Heroes.Select(hero => MakeButton(hero.Name)).ToArray();
@@ -95,14 +104,6 @@ sealed class NotesOverlayForm : OverlayForm
             scroll.Controls.Add(careerButtons[index]);
         }
 
-        loadouts.SelectedIndexChanged += (_, _) =>
-        {
-            if (Suppressed || loadouts.SelectedItem is not LoadoutItem item)
-                return;
-            book.SelectLoadout(item.Id);
-            ClosePicker();
-            RefreshBoard();
-        };
         nameBox.TextChanged += (_, _) =>
         {
             if (Suppressed)
@@ -116,6 +117,8 @@ sealed class NotesOverlayForm : OverlayForm
                 return;
             book.SetNotes(notesBox.Text);
         };
+        nameBox.Enter += (_, _) => ClosePicker();
+        notesBox.Enter += (_, _) => ClosePicker();
         createButton = MakeButton("New");
         createButton.TextAlign = ContentAlignment.MiddleCenter;
         createButton.Click += (_, _) =>
@@ -144,10 +147,12 @@ sealed class NotesOverlayForm : OverlayForm
             ClosePicker();
             RefreshBoard();
         };
+        loadoutButton = MakeButton("Loadout");
+        loadoutButton.Click += (_, _) => OpenPicker("loadout", "loadout", loadoutButton.Bounds);
         var closeButton = MakeButton("Close");
         closeButton.TextAlign = ContentAlignment.MiddleCenter;
         closeButton.Click += (_, _) => CloseRequested?.Invoke();
-        scroll.Controls.Add(loadouts);
+        scroll.Controls.Add(loadoutButton);
         scroll.Controls.Add(nameBox);
         scroll.Controls.Add(createButton);
         scroll.Controls.Add(deleteButton);
@@ -175,9 +180,6 @@ sealed class NotesOverlayForm : OverlayForm
         scroll.Controls.Add(notesBox);
         StyleField(nameBox);
         StyleField(notesBox);
-        loadouts.BackColor = Color.FromArgb(22, 22, 22);
-        loadouts.ForeColor = Color.FromArgb(235, 235, 235);
-        loadouts.FlatStyle = FlatStyle.Flat;
         picker.BackColor = Color.FromArgb(22, 22, 22);
         picker.ForeColor = Color.FromArgb(235, 235, 235);
         pickerCaption.BackColor = PanelColor;
@@ -185,9 +187,12 @@ sealed class NotesOverlayForm : OverlayForm
         talentsCaption.BackColor = PanelColor;
         notesCaption.BackColor = PanelColor;
         descriptions.BackColor = PanelColor;
-        picker.SelectedIndexChanged += (_, _) =>
+        picker.MouseUp += (_, args) =>
         {
-            if (Suppressed || picker.SelectedItem is not PickChoice choice)
+            if (Suppressed)
+                return;
+            var index = picker.IndexFromPoint(args.Location);
+            if (index < 0 || picker.Items[index] is not PickChoice choice)
                 return;
             ApplyPick(choice);
         };
@@ -221,6 +226,7 @@ sealed class NotesOverlayForm : OverlayForm
                 var talentColumn = column;
                 button.Click += (_, _) =>
                 {
+                    ClosePicker();
                     book.ToggleTalent(talentRow, talentColumn);
                     RefreshTalents();
                 };
@@ -230,6 +236,9 @@ sealed class NotesOverlayForm : OverlayForm
         }
 
         RefreshBoard();
+        var area = Screen.PrimaryScreen?.WorkingArea.Size ?? new Size(1280, 720);
+        Size = area;
+        CreateHandle();
         ready = true;
         LayoutBoard();
     }
@@ -263,17 +272,7 @@ sealed class NotesOverlayForm : OverlayForm
                 PaintSelected(careerButtons[index], career?.Id == book.Career.Id);
             }
 
-            loadouts.Items.Clear();
-            foreach (var loadout in book.ForCurrentCareer())
-                loadouts.Items.Add(new LoadoutItem(loadout.Id, DisplayName(loadout)));
-            if (book.Current is not null)
-            {
-                for (var index = 0; index < loadouts.Items.Count; index++)
-                {
-                    if (loadouts.Items[index] is LoadoutItem item && item.Id == book.Current.Id)
-                        loadouts.SelectedIndex = index;
-                }
-            }
+            loadoutButton.Text = book.Current is null ? "Loadout" : DisplayName(book.Current);
 
             var hasLoadout = book.Current is not null;
             nameBox.Enabled = hasLoadout;
@@ -293,22 +292,7 @@ sealed class NotesOverlayForm : OverlayForm
 
     void RefreshLoadoutNames()
     {
-        if (book.Current is null)
-            return;
-
-        var selected = loadouts.SelectedIndex;
-        if (selected < 0 || selected >= loadouts.Items.Count)
-            return;
-
-        suppress++;
-        try
-        {
-            loadouts.Items[selected] = new LoadoutItem(book.Current.Id, DisplayName(book.Current));
-        }
-        finally
-        {
-            suppress--;
-        }
+        loadoutButton.Text = book.Current is null ? "Loadout" : DisplayName(book.Current);
     }
 
     void RefreshCards()
@@ -318,27 +302,25 @@ sealed class NotesOverlayForm : OverlayForm
         {
             var gear = book.Gear(card.Slot);
             var weapon = book.Catalog.FindWeapon(gear?.WeaponId);
-            card.Icon.Image = SlotIcon(card.Slot);
-            if (card.HasWeapon)
-            {
-                card.Weapon.Text = weapon?.Name ?? "Choose weapon";
-                card.Keywords.Text = weapon?.Keywords ?? "";
-                card.Weapon.Enabled = enabled;
-                SetIcon(card.Weapon, icons.Weapon(gear?.WeaponId));
-            }
-
             var trait = book.Catalog.FindTrait(book.TraitGroup(card.Slot), gear?.TraitId);
-            card.Trait.Text = trait?.Name ?? "Choose trait";
-            SetIcon(card.Trait, icons.Trait(gear?.TraitId));
-            card.Trait.Enabled = enabled && book.TraitGroup(card.Slot) is not null;
-            tips.SetToolTip(card.Trait, trait?.Description ?? "");
-
             var pool = book.PropertyPool(card.Slot);
-            card.PropertyA.Text = book.Catalog.FindProperty(pool, gear?.PropertyA)?.Line ?? "Choose property";
-            card.PropertyB.Text = book.Catalog.FindProperty(pool, gear?.PropertyB)?.Line ?? "Choose property";
-            var canPickProperty = enabled && pool is not null;
-            card.PropertyA.Enabled = canPickProperty;
-            card.PropertyB.Enabled = canPickProperty;
+            var lineA = book.Catalog.FindProperty(pool, gear?.PropertyA)?.Line ?? "Choose property";
+            var lineB = book.Catalog.FindProperty(pool, gear?.PropertyB)?.Line ?? "Choose property";
+            card.ShowItem(
+                enabled,
+                card.HasWeapon ? weapon?.Name ?? "Choose weapon" : card.SlotTitle,
+                lineA,
+                lineB,
+                gear?.PropertyA is not null,
+                gear?.PropertyB is not null,
+                trait?.Name ?? "Choose trait",
+                trait?.Description ?? "",
+                trait is not null,
+                card.HasWeapon ? weapon?.Keywords ?? "" : "",
+                card.HasWeapon ? icons.Weapon(gear?.WeaponId) : SlotIcon(card.Slot),
+                icons.Trait(gear?.TraitId),
+                ResourceLabel(weapon),
+                !card.HasWeapon || weapon is not null);
         }
     }
 
@@ -368,22 +350,21 @@ sealed class NotesOverlayForm : OverlayForm
         }
     }
 
-    void OpenPicker(string slot, string field)
+    void OpenPicker(string slot, string field, Rectangle anchor)
     {
         if (pickerSlot == slot && pickerField == field)
         {
             ClosePicker();
-            LayoutBoard();
             return;
         }
 
-        var choices = Choices(slot, field);
+        var choices = field == "loadout" ? LoadoutChoices() : Choices(slot, field);
         if (choices.Count == 0)
             return;
 
         pickerSlot = slot;
         pickerField = field;
-        pickerCaption.Text = PickerTitle(slot, field);
+        pickerCaption.Text = field == "loadout" ? "Loadout" : PickerTitle(slot, field);
         pickerDetail.Text = "";
         suppress++;
         try
@@ -397,11 +378,13 @@ sealed class NotesOverlayForm : OverlayForm
             suppress--;
         }
 
+        PositionPopup(anchor);
         pickerCaption.Visible = true;
         picker.Visible = true;
-        pickerDetail.Visible = true;
-        LayoutBoard();
-        scroll.ScrollControlIntoView(picker);
+        pickerDetail.Visible = field is "weapon" or "trait";
+        pickerCaption.BringToFront();
+        picker.BringToFront();
+        pickerDetail.BringToFront();
     }
 
     void ClosePicker()
@@ -423,6 +406,11 @@ sealed class NotesOverlayForm : OverlayForm
 
         switch (field)
         {
+            case "loadout":
+                book.SelectLoadout(choice.Id);
+                ClosePicker();
+                RefreshBoard();
+                return;
             case "weapon":
                 book.SetWeapon(slot, choice.Id);
                 break;
@@ -439,7 +427,31 @@ sealed class NotesOverlayForm : OverlayForm
 
         ClosePicker();
         RefreshCards();
-        LayoutBoard();
+    }
+
+    List<PickChoice> LoadoutChoices()
+    {
+        var list = new List<PickChoice>();
+        foreach (var loadout in book.ForCurrentCareer())
+            list.Add(new PickChoice(loadout.Id, DisplayName(loadout), null));
+        return list;
+    }
+
+    void PositionPopup(Rectangle anchor)
+    {
+        var width = Math.Clamp(Math.Max(anchor.Width, 280), 220, Math.Max(220, scroll.ClientSize.Width - 16));
+        var listHeight = Math.Min(8 * picker.ItemHeight, Math.Max(picker.ItemHeight, picker.Items.Count * picker.ItemHeight));
+        var detailHeight = pickerField is "weapon" or "trait" ? 48 : 0;
+        const int captionHeight = 20;
+        var height = captionHeight + listHeight + detailHeight;
+        var x = Math.Clamp(anchor.Left, 8, Math.Max(8, scroll.ClientSize.Width - width - 8));
+        var y = anchor.Bottom + 2;
+        if (y + height > scroll.ClientSize.Height - 8)
+            y = Math.Max(8, anchor.Top - height - 2);
+
+        pickerCaption.SetBounds(x, y, width, captionHeight);
+        picker.SetBounds(x, y + captionHeight, width, listHeight);
+        pickerDetail.SetBounds(x, picker.Bottom, width, detailHeight);
     }
 
     List<PickChoice> Choices(string slot, string field)
@@ -496,20 +508,17 @@ sealed class NotesOverlayForm : OverlayForm
     {
         if (!ready || layingOut || ClientSize.Width < 80 || ClientSize.Height < 80)
             return;
+        if (laidOutReady && laidOutSize == ClientSize && laidOutDescriptions == descriptions.Checked)
+            return;
 
         layingOut = true;
         try
         {
-            var width = ClientSize.Width;
-            var bottom = Place(width);
-            if (bottom > ClientSize.Height)
-            {
-                var narrower = width - SystemInformation.VerticalScrollBarWidth;
-                if (narrower > 80)
-                    bottom = Place(narrower);
-            }
-
-            scroll.AutoScrollMinSize = new Size(0, bottom);
+            ClosePicker();
+            Place(ClientSize.Width, ClientSize.Height);
+            laidOutSize = ClientSize;
+            laidOutDescriptions = descriptions.Checked;
+            laidOutReady = true;
         }
         finally
         {
@@ -517,12 +526,14 @@ sealed class NotesOverlayForm : OverlayForm
         }
     }
 
-    int Place(int width)
+    void Place(int width, int height)
     {
         const int gap = 8;
-        var inner = Math.Max(320, width - 24);
-        var x = 12;
-        var y = 12;
+        const int pad = 12;
+        var inner = Math.Max(320, width - pad * 2);
+        var x = pad;
+        var y = pad;
+        var bottom = height - pad;
 
         var shownCareers = new List<Control>(careerButtons.Length);
         for (var index = 0; index < careerButtons.Length; index++)
@@ -531,89 +542,61 @@ sealed class NotesOverlayForm : OverlayForm
                 shownCareers.Add(careerButtons[index]);
         }
 
-        PlaceRow(heroButtons, x, y, inner, 42);
-        y += 50;
-        PlaceRow(shownCareers.ToArray(), x, y, inner, 52);
-        y += 60;
+        PlaceRow(heroButtons, x, y, inner, 40);
+        y += 48;
+        PlaceRow(shownCareers.ToArray(), x, y, inner, 48);
+        y += 56;
 
         var buttonWidth = 72;
         var buttonsWidth = buttonWidth * 3 + gap * 2;
-        var comboWidth = Math.Min(180, Math.Max(96, (inner - buttonsWidth) / 3));
-        var nameWidth = Math.Max(80, inner - buttonsWidth - comboWidth - gap * 2);
-        loadouts.SetBounds(x, y, comboWidth, 26);
-        nameBox.SetBounds(loadouts.Right + gap, y, nameWidth, 26);
-        createButton.SetBounds(nameBox.Right + gap, y, buttonWidth, 26);
-        deleteButton.SetBounds(createButton.Right + gap, y, buttonWidth, 26);
-        CloseButton.SetBounds(deleteButton.Right + gap, y, buttonWidth, 26);
-        y += 36;
+        var loadoutWidth = Math.Min(220, Math.Max(120, (inner - buttonsWidth) / 3));
+        var nameWidth = Math.Max(80, inner - buttonsWidth - loadoutWidth - gap * 2);
+        loadoutButton.SetBounds(x, y, loadoutWidth, 28);
+        nameBox.SetBounds(loadoutButton.Right + gap, y, nameWidth, 28);
+        createButton.SetBounds(nameBox.Right + gap, y, buttonWidth, 28);
+        deleteButton.SetBounds(createButton.Right + gap, y, buttonWidth, 28);
+        CloseButton.SetBounds(deleteButton.Right + gap, y, buttonWidth, 28);
+        y += 38;
 
-        var cardWidth = 210;
-        var columns = Math.Max(1, (inner + gap) / (cardWidth + gap));
-        columns = Math.Min(columns, cards.Length);
-        cardWidth = (inner - gap * (columns - 1)) / columns;
+        var notesHeight = descriptions.Checked ? 72 : 110;
+        var reserved = 20 + notesHeight + 8 + 26;
+        var available = Math.Max(220, bottom - y - reserved);
+        var cardHeight = Math.Clamp(available * 50 / 100, 176, 320);
+        var talentBand = available - cardHeight - gap;
+        var rowHeight = Math.Max(28, (talentBand - gap * 5) / 6);
+        if (descriptions.Checked)
+            rowHeight = Math.Max(rowHeight, 48);
+
+        var cardWidth = (inner - gap * (cards.Length - 1)) / cards.Length;
         for (var index = 0; index < cards.Length; index++)
-        {
-            var column = index % columns;
-            var row = index / columns;
-            cards[index].Panel.SetBounds(x + column * (cardWidth + gap), y + row * (CardHeight + gap), cardWidth, CardHeight);
-        }
-
-        var cardRows = (cards.Length + columns - 1) / columns;
-        y += cardRows * (CardHeight + gap);
-
-        pickerCaption.Visible = pickerSlot is not null;
-        picker.Visible = pickerSlot is not null;
-        pickerDetail.Visible = pickerSlot is not null;
-        if (pickerSlot is not null)
-        {
-            pickerCaption.SetBounds(x, y, inner, 18);
-            y += 20;
-            picker.SetBounds(x, y, inner, 132);
-            y += 136;
-            pickerDetail.SetBounds(x, y, inner, 36);
-            y += 40;
-        }
+            cards[index].SetBounds(x + index * (cardWidth + gap), y, cardWidth, cardHeight);
+        y += cardHeight + gap;
 
         talentsCaption.SetBounds(x, y, 80, 22);
-        descriptions.Location = new Point(x + inner - descriptions.Width, y);
+        var descriptionWidth = Math.Max(descriptions.Width, descriptions.PreferredSize.Width);
+        descriptions.Location = new Point(Math.Max(x, x + inner - descriptionWidth), y);
         y += 26;
 
         var levelWidth = 36;
         var cellWidth = (inner - levelWidth - gap * 3) / 3;
         for (var row = 0; row < 6; row++)
         {
-            var cellHeight = 40;
-            if (descriptions.Checked)
-            {
-                for (var column = 0; column < 3; column++)
-                {
-                    var measured = TextRenderer.MeasureText(
-                        talents[row, column].Text,
-                        Font,
-                        new Size(Math.Max(40, cellWidth - 12), int.MaxValue),
-                        TextFormatFlags.WordBreak);
-                    cellHeight = Math.Max(cellHeight, measured.Height + 10);
-                }
-            }
-
-            levels[row].SetBounds(x, y, levelWidth, cellHeight);
+            levels[row].SetBounds(x, y, levelWidth, rowHeight);
             for (var column = 0; column < 3; column++)
             {
                 talents[row, column].SetBounds(
                     x + levelWidth + gap + column * (cellWidth + gap),
                     y,
                     cellWidth,
-                    cellHeight);
+                    rowHeight);
             }
 
-            y += cellHeight + gap;
+            y += rowHeight + gap;
         }
 
-        y += 4;
         notesCaption.SetBounds(x, y, inner, 18);
-        y += 22;
-        notesBox.SetBounds(x, y, inner, 140);
-        return y + 152;
+        y += 20;
+        notesBox.SetBounds(x, y, inner, Math.Max(48, bottom - y));
     }
 
     static void PlaceRow(Control[] controls, int x, int y, int inner, int height)
@@ -630,68 +613,16 @@ sealed class NotesOverlayForm : OverlayForm
         }
     }
 
-    CardUi MakeCard(string slot, string title, bool hasWeapon)
+    RedItemCard MakeCard(string slot, string title, bool hasWeapon)
     {
-        var panel = new Panel { BackColor = Color.FromArgb(36, 32, 30), Height = CardHeight };
-        var icon = new PictureBox
+        var card = new RedItemCard(slot, title, hasWeapon);
+        card.PartClicked += (field, part) =>
         {
-            BackColor = panel.BackColor,
-            Location = new Point(8, 4),
-            Size = new Size(20, 20),
-            SizeMode = PictureBoxSizeMode.Zoom
+            var anchor = new Rectangle(card.Left + part.X, card.Top + part.Y, part.Width, part.Height);
+            OpenPicker(slot, field, anchor);
         };
-        var heading = new Label
-        {
-            Text = title,
-            ForeColor = Color.FromArgb(212, 168, 92),
-            BackColor = panel.BackColor,
-            Location = new Point(32, 6),
-            Size = new Size(156, 18),
-            Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-        };
-        var weapon = MakeButton("Choose weapon");
-        var keywords = new Label
-        {
-            ForeColor = HintColor,
-            BackColor = panel.BackColor,
-            Location = new Point(8, 60),
-            Size = new Size(180, 32),
-            Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
-        };
-        var trait = MakeButton("Choose trait");
-        var propertyA = MakeButton("Choose property");
-        var propertyB = MakeButton("Choose property");
-        panel.Controls.Add(icon);
-        panel.Controls.Add(heading);
-        panel.Controls.Add(keywords);
-        if (hasWeapon)
-        {
-            weapon.SetBounds(8, 28, 180, 30);
-            trait.SetBounds(8, 94, 180, 30);
-            propertyA.SetBounds(8, 126, 180, 26);
-            propertyB.SetBounds(8, 154, 180, 26);
-        }
-        else
-        {
-            weapon.Visible = false;
-            keywords.Visible = false;
-            trait.SetBounds(8, 32, 180, 30);
-            propertyA.SetBounds(8, 66, 180, 26);
-            propertyB.SetBounds(8, 96, 180, 26);
-        }
-
-        foreach (var button in new[] { weapon, trait, propertyA, propertyB })
-        {
-            button.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-            panel.Controls.Add(button);
-        }
-
-        weapon.Click += (_, _) => OpenPicker(slot, "weapon");
-        trait.Click += (_, _) => OpenPicker(slot, "trait");
-        propertyA.Click += (_, _) => OpenPicker(slot, "property-a");
-        propertyB.Click += (_, _) => OpenPicker(slot, "property-b");
-        scroll.Controls.Add(panel);
-        return new CardUi(slot, hasWeapon, panel, icon, weapon, keywords, trait, propertyA, propertyB);
+        scroll.Controls.Add(card);
+        return card;
     }
 
     Button MakeButton(string text)
@@ -729,13 +660,6 @@ sealed class NotesOverlayForm : OverlayForm
         }
 
         base.WndProc(ref m);
-    }
-
-    protected override void OnVisibleChanged(EventArgs e)
-    {
-        base.OnVisibleChanged(e);
-        if (Visible)
-            LayoutBoard();
     }
 
     void DrawPick(object? sender, DrawItemEventArgs e)
@@ -805,20 +729,46 @@ sealed class NotesOverlayForm : OverlayForm
     static string DisplayName(Loadout loadout) =>
         string.IsNullOrWhiteSpace(loadout.Name) ? "Loadout" : loadout.Name;
 
-    sealed record CardUi(
-        string Slot,
-        bool HasWeapon,
-        Panel Panel,
-        PictureBox Icon,
-        Button Weapon,
-        Label Keywords,
-        Button Trait,
-        Button PropertyA,
-        Button PropertyB);
-
-    sealed record LoadoutItem(string Id, string Name)
+    static string ResourceLabel(WeaponInfo? weapon) => weapon?.Traits switch
     {
-        public override string ToString() => Name;
+        "ammo" => "Ammunition",
+        "heat" => "Overcharge",
+        "energy" => "Energy",
+        _ => ""
+    };
+
+    static Image? LoadBackdrop()
+    {
+        var path = Path.Combine(AppContext.BaseDirectory, "Catalog", "icons", "background.png");
+        if (!File.Exists(path))
+            return null;
+
+        try
+        {
+            using var stream = File.OpenRead(path);
+            using var source = new Bitmap(stream);
+            return new Bitmap(source);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
+
+    void PaintBackdrop(object? sender, PaintEventArgs e)
+    {
+        if (backdrop is null)
+            return;
+
+        var bounds = scroll.ClientRectangle;
+        if (bounds.Width < 1 || bounds.Height < 1)
+            return;
+
+        var scale = Math.Max(bounds.Width / (float)backdrop.Width, bounds.Height / (float)backdrop.Height);
+        var width = backdrop.Width * scale;
+        var height = backdrop.Height * scale;
+        e.Graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        e.Graphics.DrawImage(backdrop, (bounds.Width - width) / 2f, (bounds.Height - height) / 2f, width, height);
     }
 
     sealed record PickChoice(string Id, string Label, string? Detail)

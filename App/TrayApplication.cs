@@ -23,6 +23,10 @@ sealed class TrayApplication : ApplicationContext
     volatile bool tagging;
     volatile bool settingsOpen;
     volatile bool notesOpen;
+    volatile bool resumeTagging;
+    int tagGeneration;
+    int resumeToken;
+    Task? tagTask;
     bool stopped;
     WindowBounds? lastBounds;
     Point statusPointShown;
@@ -94,14 +98,21 @@ sealed class TrayApplication : ApplicationContext
 
     Task Activate()
     {
-        if (!HotkeysAllowed() || tagging)
+        if (!HotkeysAllowed() || notesOpen || tagging)
             return Task.CompletedTask;
 
-        tagging = true;
-        return RunTag();
+        return StartTagging();
     }
 
-    async Task RunTag()
+    Task StartTagging()
+    {
+        var generation = Interlocked.Increment(ref tagGeneration);
+        tagging = true;
+        tagTask = RunTag(generation);
+        return tagTask;
+    }
+
+    async Task RunTag(int generation)
     {
         try
         {
@@ -109,7 +120,8 @@ sealed class TrayApplication : ApplicationContext
         }
         finally
         {
-            tagging = false;
+            if (generation == Volatile.Read(ref tagGeneration))
+                tagging = false;
         }
     }
 
@@ -118,8 +130,55 @@ sealed class TrayApplication : ApplicationContext
         if (!HotkeysAllowed())
             return Task.CompletedTask;
 
+        CancelTaggingResume();
         tagging = false;
         return Task.CompletedTask;
+    }
+
+    void PauseTagging()
+    {
+        if (!tagging)
+            return;
+
+        resumeTagging = true;
+        tagging = false;
+    }
+
+    void CancelTaggingResume()
+    {
+        resumeTagging = false;
+        resumeToken++;
+    }
+
+    void ResumeTagging()
+    {
+        if (!resumeTagging)
+            return;
+
+        var token = resumeToken;
+        var pending = tagTask;
+        _ = FinishResume(pending, token);
+    }
+
+    async Task FinishResume(Task? pending, int token)
+    {
+        if (pending is not null)
+        {
+            try
+            {
+                await pending.ConfigureAwait(true);
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        if (token != resumeToken || !resumeTagging || notesOpen)
+            return;
+
+        resumeTagging = false;
+        if (HotkeysAllowed())
+            _ = StartTagging();
     }
 
     Task ToggleEdit()
@@ -136,8 +195,14 @@ sealed class TrayApplication : ApplicationContext
         if (HotkeysAllowed())
         {
             notesOpen = !notesOpen;
-            if (!notesOpen && (inputSimulator.IsActiveWindow() || IsThisProcessForeground()))
-                inputSimulator.WinActivate(ProcessName);
+            if (notesOpen)
+                PauseTagging();
+            else
+            {
+                ResumeTagging();
+                if (inputSimulator.IsActiveWindow() || IsThisProcessForeground())
+                    inputSimulator.WinActivate(ProcessName);
+            }
             return Task.CompletedTask;
         }
 
@@ -149,6 +214,7 @@ sealed class TrayApplication : ApplicationContext
     void CloseNotes()
     {
         notesOpen = false;
+        ResumeTagging();
         if (IsThisProcessForeground())
             inputSimulator.WinActivate(ProcessName);
     }
@@ -305,10 +371,8 @@ sealed class TrayApplication : ApplicationContext
             return;
         }
 
-        var notesSize = new Size(
-            Math.Max(1, bounds.Width - OverlayPlacement.Margin * 2),
-            Math.Max(1, bounds.Height - OverlayPlacement.Margin * 2));
-        var notesPoint = new Point(bounds.Left + OverlayPlacement.Margin, bounds.Top + OverlayPlacement.Margin);
+        var notesSize = new Size(Math.Max(1, bounds.Width), Math.Max(1, bounds.Height));
+        var notesPoint = new Point(bounds.Left, bounds.Top);
         Place(notesForm, notesPoint, notesSize, ref notesPointShown, ref notesSizeShown, ref notesVisible);
         if (settingsVisible)
             notesForm.BringAbove();
