@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Vermintide_2;
+namespace VerminKit;
 
 class OverlayForm : Form
 {

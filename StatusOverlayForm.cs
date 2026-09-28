@@ -1,4 +1,4 @@
-namespace Vermintide_2;
+namespace VerminKit;
 
 sealed class StatusOverlayForm : OverlayForm
 {

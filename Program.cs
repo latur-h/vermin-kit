@@ -1,8 +1,8 @@
-﻿namespace Vermintide_2;
+﻿namespace VerminKit;
 
 static class Program
 {
-    const string MutexName = @"Local\Vermintide2";
+    const string MutexName = @"Local\VerminKit";
 
     [STAThread]
     static void Main()

@@ -1,4 +1,4 @@
-namespace Vermintide_2;
+namespace VerminKit;
 
 readonly record struct WindowBounds(int Left, int Top, int Right, int Bottom)
 {

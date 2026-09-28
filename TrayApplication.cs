@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Poss.Win.Automation.GlobalHotKeys;
 using Poss.Win.Automation.Input;
 
-namespace Vermintide_2;
+namespace VerminKit;
 
 sealed class TrayApplication : ApplicationContext
 {
@@ -44,7 +44,7 @@ sealed class TrayApplication : ApplicationContext
         {
             Icon = trayIcon,
             Visible = true,
-            Text = "Vermintide 2 is running"
+            Text = "Vermin Kit is running"
         };
 
         var menu = new ContextMenuStrip();
@@ -65,7 +65,7 @@ sealed class TrayApplication : ApplicationContext
         }
         catch (Exception ex)
         {
-            MessageBox.Show(ex.Message, "Vermintide 2", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBox.Show(ex.Message, "Vermin Kit", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         placementTimer = new System.Windows.Forms.Timer { Interval = 100 };

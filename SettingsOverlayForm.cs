@@ -1,6 +1,6 @@
 using Poss.Win.Automation.Input;
 
-namespace Vermintide_2;
+namespace VerminKit;
 
 sealed class SettingsOverlayForm : OverlayForm
 {

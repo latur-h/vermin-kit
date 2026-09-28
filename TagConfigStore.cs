@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Vermintide_2;
+namespace VerminKit;
 
 static class TagConfigStore
 {
@@ -12,7 +12,7 @@ static class TagConfigStore
 
     public static string DirectoryPath { get; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-        "Vermintide 2");
+        "Vermin Kit");
 
     public static string FilePath { get; } = Path.Combine(DirectoryPath, "config.json");
 
@@ -34,13 +34,18 @@ static class TagConfigStore
         try
         {
             Directory.CreateDirectory(DirectoryPath);
-            if (!File.Exists(FilePath))
+            var legacyFile = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Vermintide 2",
+                "config.json");
+            var source = File.Exists(FilePath) ? FilePath : legacyFile;
+            if (!File.Exists(source))
             {
                 Save(snapshot);
                 return new LoadedConfig(snapshot, null);
             }
 
-            var file = JsonSerializer.Deserialize<TagConfigFile>(File.ReadAllText(FilePath), JsonOptions);
+            var file = JsonSerializer.Deserialize<TagConfigFile>(File.ReadAllText(source), JsonOptions);
             if (file is null)
                 return new LoadedConfig(snapshot, null);
 
@@ -62,6 +67,8 @@ static class TagConfigStore
                     ? TagSettings.DefaultActivateKey
                     : TagSettings.DefaultDeactivateKey;
             snapshot = snapshot with { ActivateKey = activate, DeactivateKey = deactivate };
+            if (!source.Equals(FilePath, StringComparison.OrdinalIgnoreCase))
+                Save(snapshot, legacyAnchor);
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
         {

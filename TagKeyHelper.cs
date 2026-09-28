@@ -1,7 +1,7 @@
 using Poss.Win.Automation.Common.Keys.Enums;
 using Poss.Win.Automation.Input;
 
-namespace Vermintide_2;
+namespace VerminKit;
 
 static class TagKeyHelper
 {
