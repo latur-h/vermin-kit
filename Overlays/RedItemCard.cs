@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
 namespace VerminKit;
@@ -55,9 +56,14 @@ sealed class RedItemCard : Control
 
     public string Slot { get; }
 
-    public string SlotTitle { get; }
+    public string SlotTitle { get; private set; }
 
     public bool HasWeapon { get; }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool Quiet { get; set; }
+
+    public void SetSubtitle(string subtitle) => SlotTitle = subtitle;
 
     public event Action<string, Rectangle>? PartClicked;
 
@@ -108,6 +114,8 @@ sealed class RedItemCard : Control
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
+        if (Quiet)
+            return;
         var next = HitAt(e.Location);
         if (next == hover)
             return;
@@ -129,7 +137,7 @@ sealed class RedItemCard : Control
     protected override void OnMouseClick(MouseEventArgs e)
     {
         base.OnMouseClick(e);
-        if (!itemEnabled || e.Button != MouseButtons.Left)
+        if (Quiet || !itemEnabled || e.Button != MouseButtons.Left)
             return;
 
         var index = HitAt(e.Location);
@@ -157,21 +165,21 @@ sealed class RedItemCard : Control
         var y = 6;
         hits[0] = HasWeapon ? new Rectangle(pad, y, textWidth, 22) : Rectangle.Empty;
         var subtitleRect = new Rectangle(pad, y + 22, textWidth, 16);
-        y += 40;
+        y += 46;
         Rectangle powerLabel = Rectangle.Empty;
         Rectangle resourceRect = Rectangle.Empty;
         Rectangle powerRect = Rectangle.Empty;
         if (showPower)
         {
-            powerLabel = new Rectangle(pad, y, 70, 14);
+            powerLabel = new Rectangle(pad, y, textWidth, 18);
             if (resource.Length > 0)
             {
                 var resourceSize = TextRenderer.MeasureText(resource, Font);
-                resourceRect = new Rectangle(Width - pad - resourceSize.Width, y, resourceSize.Width, 14);
+                resourceRect = new Rectangle(Width - pad - resourceSize.Width, y, resourceSize.Width, 18);
             }
 
-            powerRect = new Rectangle(pad, y + 14, textWidth, 28);
-            y += 46;
+            powerRect = new Rectangle(pad, y + 22, textWidth, 30);
+            y += 58;
         }
 
         hits[1] = new Rectangle(pad, y, Width - pad * 2, 18);
@@ -199,8 +207,10 @@ sealed class RedItemCard : Control
             DrawLine(graphics, "300", powerFont, PowerColor, powerRect);
         }
 
-        DrawLine(graphics, "◆  " + propertyA, Font, propertyASet ? PropertyColor : PlaceholderColor, hits[1]);
-        DrawLine(graphics, "◆  " + propertyB, Font, propertyBSet ? PropertyColor : PlaceholderColor, hits[2]);
+        if (propertyA.Length > 0)
+            DrawLine(graphics, "◆  " + propertyA, Font, propertyASet ? PropertyColor : PlaceholderColor, hits[1]);
+        if (propertyB.Length > 0)
+            DrawLine(graphics, "◆  " + propertyB, Font, propertyBSet ? PropertyColor : PlaceholderColor, hits[2]);
 
         var traitTextX = pad;
         if (traitIcon is not null)
@@ -209,12 +219,15 @@ sealed class RedItemCard : Control
             traitTextX += 26;
         }
 
-        DrawLine(
-            graphics,
-            traitName,
-            Font,
-            traitSet ? TraitColor : PlaceholderColor,
-            new Rectangle(traitTextX, hits[3].Y, Width - traitTextX - pad, 18));
+        if (traitName.Length > 0)
+        {
+            DrawLine(
+                graphics,
+                traitName,
+                Font,
+                traitSet ? TraitColor : PlaceholderColor,
+                new Rectangle(traitTextX, hits[3].Y, Width - traitTextX - pad, 18));
+        }
         if (traitDescription.Length > 0)
         {
             TextRenderer.DrawText(

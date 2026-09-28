@@ -45,6 +45,7 @@ static class LoadoutStore
 sealed class NotesFile
 {
     public string? CareerId { get; set; }
+    public bool ShowDescriptions { get; set; }
     public Dictionary<string, string>? Selected { get; set; }
     public List<Loadout>? Loadouts { get; set; }
 }

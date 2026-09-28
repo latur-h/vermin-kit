@@ -187,7 +187,7 @@ sealed class NoFocusButton : Button
     }
 }
 
-sealed class BoardButton : Button
+class BoardButton : Button
 {
     const int WM_MOUSEACTIVATE = 0x0021;
     const int MA_ACTIVATE = 1;

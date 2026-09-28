@@ -34,6 +34,7 @@ sealed class LoadoutBook
             }
         }
 
+        ShowDescriptions = file.ShowDescriptions;
         var career = catalog.FindCareer(file.CareerId) ?? catalog.Heroes[0].Careers[0];
         Career = career;
         Current = FindSelected(career.Id);
@@ -44,6 +45,8 @@ sealed class LoadoutBook
     public GameCatalog Catalog => catalog;
 
     public CareerInfo Career { get; private set; }
+
+    public bool ShowDescriptions { get; private set; }
 
     public Loadout? Current { get; private set; }
 
@@ -129,6 +132,15 @@ sealed class LoadoutBook
             return;
 
         Current.Name = name;
+        Save();
+    }
+
+    public void SetShowDescriptions(bool show)
+    {
+        if (ShowDescriptions == show)
+            return;
+
+        ShowDescriptions = show;
         Save();
     }
 
@@ -324,6 +336,7 @@ sealed class LoadoutBook
         LoadoutStore.Save(new NotesFile
         {
             CareerId = Career.Id,
+            ShowDescriptions = ShowDescriptions,
             Selected = new Dictionary<string, string>(selected, StringComparer.Ordinal),
             Loadouts = loadouts
         });

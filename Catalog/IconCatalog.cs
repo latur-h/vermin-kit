@@ -7,12 +7,12 @@ sealed class IconCatalog
     readonly string root = Path.Combine(AppContext.BaseDirectory, "Catalog", "icons");
     readonly Dictionary<string, Image?> images = new(StringComparer.OrdinalIgnoreCase);
 
-    public Image? Hero(string id) => Load(Path.Combine("heroes", id + ".png"), 32);
+    public Image? Hero(string id, int size = 48) => Load(Path.Combine("heroes", id + ".png"), size);
 
-    public Image? Career(string id) => Load(Path.Combine("careers", id + ".png"), 40);
+    public Image? Career(string id, int size = 56) => Load(Path.Combine("careers", id + ".png"), size);
 
-    public Image? Talent(string careerId, int row, int column) =>
-        Load(Path.Combine("talents", careerId, (row * 3 + column + 1).ToString("00") + ".png"), 28);
+    public Image? Talent(string careerId, int row, int column, int size = 56) =>
+        Load(Path.Combine("talents", careerId, (row * 3 + column + 1).ToString("00") + ".png"), size);
 
     public Image? Weapon(string? id) =>
         string.IsNullOrEmpty(id) ? null : Load(Path.Combine("weapons", id + ".png"), 22);
