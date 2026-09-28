@@ -26,12 +26,12 @@ Windows tray app that holds a tag key in Vermintide 2 while that game is focused
 
 ## Runtime
 
-Target process is `vermintide2_dx12.exe`. Hotkeys run only when that window is active.
+Target process is `vermintide2_dx12.exe`. Hotkeys run only when that window is active. A Debug build skips that check, and if the game rect is unknown the overlays use the primary screen working area. Release still requires the game.
 
 - Activate starts the tag loop: key down, wait `keyGapMs`, key up, wait `tagDelayMs`, repeat. Deactivate clears the flag. A held key is released on stop or cancel.
 - Edit is fixed `F5` and toggles the settings overlay. Notes is fixed `F6` and toggles the loadout board. Neither can be assigned as a tag or hotkey.
 - Hotkey ids are `"activate"`, `"deactivate"`, `"edit"`, `"notes"`. Changing activate/deactivate calls `hotkeys.Change`.
-- The timer tracks the game rect. Overlays hide unless the game is foreground or this process is. Bounds under 50 px, or left/top below -1000, are ignored. While dragging, the timer is 16 ms; on release it saves the status offset and returns to 100 ms.
+- The timer tracks the game rect. Overlays hide unless the game is foreground or this process is. A Debug build keeps them up without that, and does not save a drag while the fallback desktop rect is in use. Bounds under 50 px, or left/top below -1000, are ignored. While dragging, the timer is 16 ms; on release it saves the status offset and returns to 100 ms.
 - F6 opens the loadout board inside the game window. It fills that window inside the 12 px margin and scrolls. Showing it does not take focus. A click does, so the play note can be typed. Each career has many named loadouts: primary, secondary, necklace, charm, trinket, six talent rows, and a play note. Weapon lists are the career allow-list. Properties and traits are the red values. Hover a talent or trait for the full description. `Show descriptions` prints talent text on the grid. F6 again, or Close, hides the board.
 - Status text shows the key that does the next action: activate key when off, deactivate key when on.
 

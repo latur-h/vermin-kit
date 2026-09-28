@@ -37,6 +37,7 @@ sealed class TrayApplication : ApplicationContext
     bool shownTagging;
     TagSnapshot shownSnapshot;
     bool dragging;
+    bool placedOnDesktop;
     Point dragCursorStart;
     Point dragStatusStart;
 
@@ -93,7 +94,7 @@ sealed class TrayApplication : ApplicationContext
 
     Task Activate()
     {
-        if (!inputSimulator.IsActiveWindow() || tagging)
+        if (!HotkeysAllowed() || tagging)
             return Task.CompletedTask;
 
         tagging = true;
@@ -114,7 +115,7 @@ sealed class TrayApplication : ApplicationContext
 
     Task Deactivate()
     {
-        if (!inputSimulator.IsActiveWindow())
+        if (!HotkeysAllowed())
             return Task.CompletedTask;
 
         tagging = false;
@@ -123,7 +124,7 @@ sealed class TrayApplication : ApplicationContext
 
     Task ToggleEdit()
     {
-        if (!inputSimulator.IsActiveWindow())
+        if (!HotkeysAllowed())
             return Task.CompletedTask;
 
         settingsOpen = !settingsOpen;
@@ -132,10 +133,10 @@ sealed class TrayApplication : ApplicationContext
 
     Task ToggleNotes()
     {
-        if (inputSimulator.IsActiveWindow())
+        if (HotkeysAllowed())
         {
             notesOpen = !notesOpen;
-            if (!notesOpen)
+            if (!notesOpen && (inputSimulator.IsActiveWindow() || IsThisProcessForeground()))
                 inputSimulator.WinActivate(ProcessName);
             return Task.CompletedTask;
         }
@@ -210,11 +211,11 @@ sealed class TrayApplication : ApplicationContext
                 lastBounds = new WindowBounds(rect.Left, rect.Top, rect.Right, rect.Bottom);
         }
 
+#if !DEBUG
         bool keep = inputSimulator.IsActiveWindow() || IsThisProcessForeground();
-        if (!keep || lastBounds is not { } bounds || bounds.Width < 50 || bounds.Height < 50 || bounds.Left < -1000 || bounds.Top < -1000)
+        if (!keep)
         {
-            if (!keep)
-                lastBounds = null;
+            lastBounds = null;
             if (dragging)
             {
                 dragging = false;
@@ -223,6 +224,30 @@ sealed class TrayApplication : ApplicationContext
             ConcealOverlays();
             return;
         }
+#endif
+
+        placedOnDesktop = false;
+        WindowBounds bounds;
+        if (lastBounds is { } game && Usable(game))
+            bounds = game;
+#if DEBUG
+        else
+        {
+            bounds = DesktopBounds();
+            placedOnDesktop = true;
+        }
+#else
+        else
+        {
+            if (dragging)
+            {
+                dragging = false;
+                placementTimer.Interval = 100;
+            }
+            ConcealOverlays();
+            return;
+        }
+#endif
 
         if (dragging)
         {
@@ -306,7 +331,8 @@ sealed class TrayApplication : ApplicationContext
 
         dragging = false;
         placementTimer.Interval = 100;
-        settings.SetOffset(next.X - bounds.Left, next.Y - bounds.Top);
+        if (!placedOnDesktop)
+            settings.SetOffset(next.X - bounds.Left, next.Y - bounds.Top);
     }
 
     void ConcealOverlays()
@@ -339,6 +365,24 @@ sealed class TrayApplication : ApplicationContext
         shownPoint = point;
         shownSize = size;
         visible = true;
+    }
+
+    bool HotkeysAllowed()
+    {
+#if DEBUG
+        return true;
+#else
+        return inputSimulator.IsActiveWindow();
+#endif
+    }
+
+    static bool Usable(WindowBounds bounds) =>
+        bounds.Width >= 50 && bounds.Height >= 50 && bounds.Left >= -1000 && bounds.Top >= -1000;
+
+    static WindowBounds DesktopBounds()
+    {
+        var area = Screen.PrimaryScreen?.WorkingArea ?? new Rectangle(0, 0, 1280, 720);
+        return new WindowBounds(area.Left, area.Top, area.Right, area.Bottom);
     }
 
     bool IsThisProcessForeground()
