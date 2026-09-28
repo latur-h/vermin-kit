@@ -190,8 +190,10 @@ sealed class SettingsOverlayForm : OverlayForm
     {
         if (!TagKeyHelper.TryNormalize(picked, out var key))
             return "Unknown key";
-        if (TagSettings.IsEditKey(key))
-            return "F5 is fixed";
+        if (TagSettings.IsReservedKey(key))
+            return key.Equals(TagSettings.NotesKey, StringComparison.OrdinalIgnoreCase)
+                ? "F6 is fixed"
+                : "F5 is fixed";
         if (key.Equals(snapshot.ActivateKey, StringComparison.OrdinalIgnoreCase)
             || key.Equals(snapshot.DeactivateKey, StringComparison.OrdinalIgnoreCase))
             return "Already used";

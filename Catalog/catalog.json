@@ -1,0 +1,3170 @@
+{
+  "heroes": [
+    {
+      "id": "kruber",
+      "name": "Markus Kruber",
+      "careers": [
+        {
+          "id": "mercenary",
+          "name": "Mercenary",
+          "primary": [
+            "kruber-mace",
+            "kruber-sword",
+            "kruber-executioner-sword",
+            "kruber-sword-and-shield",
+            "kruber-mace-and-shield",
+            "kruber-bretonnian-longsword",
+            "kruber-mace-and-sword",
+            "kruber-spear-and-shield",
+            "kruber-tuskgor-spear",
+            "kruber-halberd",
+            "kruber-greatsword",
+            "kruber-two-handed-hammer"
+          ],
+          "secondary": [
+            "kruber-handgun",
+            "kruber-repeater-handgun",
+            "kruber-blunderbuss"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              }
+            ],
+            [
+              {
+                "name": "The More the Merrier!",
+                "description": "Increases Power by 5.0% for every nearby enemy and stacks up to 5 times."
+              },
+              {
+                "name": "Limb-Splitter",
+                "description": "Increases cleave power by 50.0%."
+              },
+              {
+                "name": "Helborg's Tutelage",
+                "description": "Every 5 hits grant a guaranteed critical strike. Critical strikes can no longer occur randomly."
+              }
+            ],
+            [
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Reikland Reaper",
+                "description": "Increases Power by 15.0% when Paced Strikes is active."
+              },
+              {
+                "name": "Enhanced Training",
+                "description": "Paced Strikes increases attack speed by 20.0%. Now requires hitting 4 targets with a single attack to trigger."
+              },
+              {
+                "name": "Strike Together",
+                "description": "Paced Strikes spreads to nearby allies."
+              }
+            ],
+            [
+              {
+                "name": "Stand Clear",
+                "description": "Increases dodge range by 20.0%."
+              },
+              {
+                "name": "Blade Barrier",
+                "description": "Reduces damage taken by 25.0% when Paced Strikes is active."
+              },
+              {
+                "name": "Black Market Supplies",
+                "description": "Increases max ammunition by 30.0%."
+              }
+            ],
+            [
+              {
+                "name": "Walk it Off",
+                "description": "Morale Boost also reduces damage taken by affected allies by 25.0% for 10 seconds."
+              },
+              {
+                "name": "Ready for Action",
+                "description": "Reduces cooldown of Morale Boost by 20.0%."
+              },
+              {
+                "name": "On Yer Feet, Mates!",
+                "description": "Morale Boost also revives knocked down allies."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "huntsman",
+          "name": "Huntsman",
+          "primary": [
+            "kruber-mace",
+            "kruber-sword",
+            "kruber-executioner-sword",
+            "kruber-sword-and-shield",
+            "kruber-mace-and-shield",
+            "kruber-bretonnian-longsword",
+            "kruber-mace-and-sword",
+            "kruber-spear-and-shield",
+            "kruber-tuskgor-spear",
+            "kruber-halberd",
+            "kruber-greatsword",
+            "kruber-two-handed-hammer"
+          ],
+          "secondary": [
+            "kruber-handgun",
+            "kruber-longbow",
+            "kruber-repeater-handgun",
+            "kruber-blunderbuss"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Keep it Coming",
+                "description": "Every third ranged hit causes the next shot to consume no ammo."
+              },
+              {
+                "name": "Make 'Em Bleed",
+                "description": "Critical hits cause enemies to take 20% increased damage for 15 seconds. Does not stack with similar effects."
+              },
+              {
+                "name": "One in the Eye",
+                "description": "Increased headshot bonus damage by 50.0%."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Thrill of the Hunt",
+                "description": "Ranged headshots Increase reload speed by 20.0% for 5 seconds."
+              },
+              {
+                "name": "Makin' It Look Easy",
+                "description": "After scoring a ranged headshot Markus gains 25% increased critical hit chance until his next critical hit."
+              },
+              {
+                "name": "Burst of Enthusiasm",
+                "description": "Scoring a ranged headshot or critical strike grants 2 temporary health. Critical headshots double the effect. Effect can trigger once per attack."
+              }
+            ],
+            [
+              {
+                "name": "Shot Crafter",
+                "description": "Killing a special restores 10.0% ammunition."
+              },
+              {
+                "name": "Thick Hide",
+                "description": "Killing a Special or Elite enemy reduces damage taken by 10.0%. Stacks 4 times. Taking a hit removes one stack."
+              },
+              {
+                "name": "Longshanks",
+                "description": "Increases movement speed by 10.0%."
+              }
+            ],
+            [
+              {
+                "name": "Blend In",
+                "description": "Reduces the cooldown of Prowl by 30.0%."
+              },
+              {
+                "name": "Concealed Strikes",
+                "description": "Attacking while under the effect of Prowl does not break stealth."
+              },
+              {
+                "name": "Head Down and Hidden",
+                "description": "Increases the duration of Prowl to 10 seconds."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "foot-knight",
+          "name": "Foot Knight",
+          "primary": [
+            "kruber-mace",
+            "kruber-sword",
+            "kruber-executioner-sword",
+            "kruber-sword-and-shield",
+            "kruber-mace-and-shield",
+            "kruber-bretonnian-longsword",
+            "kruber-mace-and-sword",
+            "kruber-spear-and-shield",
+            "kruber-halberd",
+            "kruber-greatsword",
+            "kruber-two-handed-hammer"
+          ],
+          "secondary": [
+            "kruber-handgun",
+            "kruber-repeater-handgun",
+            "kruber-blunderbuss"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Staggering Force",
+                "description": "Increases stagger power by 35.0%."
+              },
+              {
+                "name": "Have at Thee!",
+                "description": "Staggering an elite enemy increases power by 15.0% for 10 seconds."
+              },
+              {
+                "name": "Crowd Clearer",
+                "description": "Pushing an enemy increases attack speed by 15.0% for 3 seconds."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Rock of the Reikland",
+                "description": "Protective Presence's size is doubled and also grants 20.0% block cost reduction."
+              },
+              {
+                "name": "That's Bloody Teamwork!",
+                "description": "Increases damage reduction from Protective Presence by 5.0% for each nearby ally."
+              },
+              {
+                "name": "Comrades in Arms",
+                "description": "Kruber gains 10.0% increased power. The closest ally to Kruber gains 50.0% damage reduction and 10.0% increased power. Passive aura from Protective Presence no longer affects allies."
+              }
+            ],
+            [
+              {
+                "name": "It's Hero Time",
+                "description": "Resets the cooldown on Valiant Charge when an ally is incapacitated."
+              },
+              {
+                "name": "Counter-Punch",
+                "description": "Blocking an attack removes the stamina cost of pushing for 1 seconds."
+              },
+              {
+                "name": "Inspiring Blow",
+                "description": "Staggering an Elite enemy accelerates the cooldown of nearby allies by 100.0% for 0.5 seconds."
+              }
+            ],
+            [
+              {
+                "name": "Numb to Pain",
+                "description": "Valiant Charge grants invulnerability for 3 seconds."
+              },
+              {
+                "name": "Battering Ram",
+                "description": "Doubles the width of Valiant Charge and allows Kruber to charge through great foes."
+              },
+              {
+                "name": "Bull of Ostland!",
+                "description": "Each enemy hit with Valiant Charge grants 3.0% attack speed for 10 seconds. Stacks up to 10 times."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "grail-knight",
+          "name": "Grail Knight",
+          "primary": [
+            "kruber-mace",
+            "kruber-sword",
+            "kruber-executioner-sword",
+            "kruber-sword-and-shield",
+            "kruber-mace-and-shield",
+            "kruber-bretonnian-longsword",
+            "kruber-mace-and-sword",
+            "kruber-bretonnian-sword-and-shield",
+            "kruber-greatsword",
+            "kruber-two-handed-hammer"
+          ],
+          "secondary": [
+            "kruber-mace",
+            "kruber-sword",
+            "kruber-executioner-sword",
+            "kruber-sword-and-shield",
+            "kruber-mace-and-shield",
+            "kruber-bretonnian-longsword",
+            "kruber-mace-and-sword",
+            "kruber-bretonnian-sword-and-shield",
+            "kruber-greatsword",
+            "kruber-two-handed-hammer"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Virtue of the Ideal",
+                "description": "Killing enemies increases power level by 8% for 10 seconds. Stacks up to 3 times."
+              },
+              {
+                "name": "Virtue of Knightly Temper",
+                "description": "Critical Strikes instantly slay enemies if their current health is less than 4 times the amount of damage of the Critical Strike. Half effect versus Lords and Monsters."
+              },
+              {
+                "name": "Virtue of Heroism",
+                "description": "Damage of heavy attacks and Blessed Blade increased by 30%."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Virtue of Duty",
+                "description": "The Lady's Favour grants an additional Quest."
+              },
+              {
+                "name": "Virtue of Purity",
+                "description": "Increases the potency of the blessings rewarded upon completing a Quest by 50%."
+              },
+              {
+                "name": "Virtue of the Penitent",
+                "description": "The party now has an additional, repeatable task. This task is always \"Slay enemies\", which only occurs when using this talent. Like the other tasks, the number required changes with difficulty. Upon completion, Markus will get a Strength Potion and the task will reset. If Markus is already carrying a potion or grimoire, the strength potion will be dropped on the ground."
+              }
+            ],
+            [
+              {
+                "name": "Virtue of Stoicism",
+                "description": "50% of damage taken is regenerated as temporary health after 5 seconds."
+              },
+              {
+                "name": "Virtue of Discipline",
+                "description": "Timed blocks increase power level by 20% for 6 seconds."
+              },
+              {
+                "name": "Virtue of the Joust",
+                "description": "Increases push arc and stamina regeneration by 30%."
+              }
+            ],
+            [
+              {
+                "name": "Virtue of Audacity",
+                "description": "Adds a second stab attack to Blessed Blade, dealing devastating single target damage."
+              },
+              {
+                "name": "Virtue of the Impetuous Knight",
+                "description": "Killing an enemy with Blessed Blade increases movement speed by 35% for 15 seconds."
+              },
+              {
+                "name": "Virtue of Confidence",
+                "description": "Changes Blessed Blade to a horizontal slash that cleaves through and staggers multiple enemies."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bardin",
+      "name": "Bardin Goreksson",
+      "careers": [
+        {
+          "id": "ranger-veteran",
+          "name": "Ranger Veteran",
+          "primary": [
+            "bardin-hammer",
+            "bardin-war-pick",
+            "bardin-axe-and-shield",
+            "bardin-axe",
+            "bardin-hammer-and-shield",
+            "bardin-dual-hammers",
+            "bardin-great-axe",
+            "bardin-cog-hammer",
+            "bardin-great-hammer"
+          ],
+          "secondary": [
+            "bardin-handgun",
+            "bardin-throwing-axes",
+            "bardin-crossbow",
+            "bardin-masterwork-pistol",
+            "bardin-grudge-raker"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Last Resort",
+                "description": "Bardin gains a 25.0% Power increase when out of ammunition."
+              },
+              {
+                "name": "Master of Improvisation",
+                "description": "Reloading a weapon reduces the cooldown of Disengage by 2 seconds."
+              },
+              {
+                "name": "Foe-Feller",
+                "description": "Increases attack speed by 5.0%."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Drunken Brawler",
+                "description": "Killing a Special grants 50% chance to drop a bottle of ale. Ale grants 3.0% attack speed and reduces damage taken by 4.0% for 5 minutes when consumed. Can stack 3 times."
+              },
+              {
+                "name": "Grungni's Cunning",
+                "description": "Increases ammunition restored by Survivalist caches to 30%, rounded down."
+              },
+              {
+                "name": "Scavenger",
+                "description": "Killing a special has a 20% chance to drop a potion or bomb instead of a Survivalist cache."
+              }
+            ],
+            [
+              {
+                "name": "No Dawdling!",
+                "description": "Increases movement speed by 10.0%."
+              },
+              {
+                "name": "Exuberance",
+                "description": "Bardin takes 30.0% less damage from behind. Whenever he scores a headshots, this bonus applies to all damage taken for 7 seconds."
+              },
+              {
+                "name": "Firing Fury",
+                "description": "Hitting 2 enemies with one ranged attack increases speed of Bardin's next reload by 35.0%."
+              }
+            ],
+            [
+              {
+                "name": "Exhilarating Vapours",
+                "description": "Allies within Bardin's smoke gain 8.0% attack speed. They also gain 3 temporary health per second."
+              },
+              {
+                "name": "Surprise Guest",
+                "description": "Disengage's stealth does not break on moving beyond the smoke cloud."
+              },
+              {
+                "name": "Ranger's Parting Gift",
+                "description": "Activating Disengage causes the next bomb Bardin throws to not be consumed. Does not stack."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "ironbreaker",
+          "name": "Ironbreaker",
+          "primary": [
+            "bardin-hammer",
+            "bardin-war-pick",
+            "bardin-axe-and-shield",
+            "bardin-axe",
+            "bardin-hammer-and-shield",
+            "bardin-dual-hammers",
+            "bardin-great-axe",
+            "bardin-cog-hammer",
+            "bardin-great-hammer"
+          ],
+          "secondary": [
+            "bardin-handgun",
+            "bardin-trollhammer-torpedo",
+            "bardin-crossbow",
+            "bardin-drakegun",
+            "bardin-drakefire-pistols",
+            "bardin-masterwork-pistol",
+            "bardin-grudge-raker"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Under Pressure",
+                "description": "Drake Fire damage increases from -80.0% to 120.0% and ranged attack speed reduces from 100.0% to -50.0% depending on overcharge. Removes overcharge slowdown."
+              },
+              {
+                "name": "Blood of Grimnir",
+                "description": "Each nearby ally increases power by 5.0%."
+              },
+              {
+                "name": "Rune-Etched Shield",
+                "description": "Blocking an attack grants Bardin and his allies 2% melee power for 6 seconds. Stacks 5 times."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Vengeance",
+                "description": "Periodically generate stacks (up to 5 max) of Rising Anger every 7 seconds while Gromril is active. When Gromril is lost, gain 8.0% attack speed per stack of Rising Anger for 10 seconds."
+              },
+              {
+                "name": "Gromril Curse",
+                "description": "When Gromril Armour is removed all nearby enemies are knocked back."
+              },
+              {
+                "name": "Tunnel Fighter",
+                "description": "Reduces the cooldown of Gromril Armour to 10 seconds."
+              }
+            ],
+            [
+              {
+                "name": "Dawi Defiance",
+                "description": "When Bardin's guard is broken there is a 50.0% chance to instantly restore all stamina."
+              },
+              {
+                "name": "The Rolling Mountain",
+                "description": "Killing enemies with melee attacks while on full stamina reduces the cooldown of Impenetrable by 2.0%."
+              },
+              {
+                "name": "Miner's Rhythm",
+                "description": "After landing a charged attack Bardin recovers stamina 40.0% faster for 2 seconds."
+              }
+            ],
+            [
+              {
+                "name": "Drengbarazi Oath",
+                "description": "Impenetrable increases power of nearby allies by 20.0% for 10 seconds."
+              },
+              {
+                "name": "Oi! Wazzok!",
+                "description": "Impenetrable taunt now forces monsters to attack Bardin."
+              },
+              {
+                "name": "Booming Taunt",
+                "description": "Increases the radius of Impenetrable's taunt by 50.0%. Increases the duration of Impenetrable to 15 seconds."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "slayer",
+          "name": "Slayer",
+          "primary": [
+            "bardin-hammer",
+            "bardin-war-pick",
+            "bardin-axe",
+            "bardin-dual-hammers",
+            "bardin-great-axe",
+            "bardin-cog-hammer",
+            "bardin-dual-axes",
+            "bardin-great-hammer"
+          ],
+          "secondary": [
+            "bardin-hammer",
+            "bardin-war-pick",
+            "bardin-axe",
+            "bardin-dual-hammers",
+            "bardin-great-axe",
+            "bardin-cog-hammer",
+            "bardin-throwing-axes",
+            "bardin-dual-axes",
+            "bardin-great-hammer"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              }
+            ],
+            [
+              {
+                "name": "A Thousand Cuts",
+                "description": "Wielding one-handed weapons in both slots increases attack speed by 10.0%. Dual weapons count as one-handed."
+              },
+              {
+                "name": "Skull-Splitter",
+                "description": "Wielding two-handed weapons in both slots increases power by 15.0%."
+              },
+              {
+                "name": "Hack and Slash",
+                "description": "Increases critical hit chance by 10%."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Impatience",
+                "description": "Each stack of Trophy Hunter increases movement speed by 10.0%."
+              },
+              {
+                "name": "High Tally",
+                "description": "Increases maximum stacks of Trophy Hunter by 1."
+              },
+              {
+                "name": "Adrenaline Surge",
+                "description": "Leap recharges 3x as fast while Trophy Hunter is at max stacks."
+              }
+            ],
+            [
+              {
+                "name": "Oblivious to Pain",
+                "description": "Damage taken from Elite enemies or Monsters is reduced to 10 damage or half of its original value whichever is highest. Applied after all other damage modifiers."
+              },
+              {
+                "name": "Grimnir's Focus",
+                "description": "Hitting an enemy with a charged attack reduces damage taken by 40% for 5 seconds."
+              },
+              {
+                "name": "Barge",
+                "description": "Effective dodges pushes nearby small enemies out of the way."
+              }
+            ],
+            [
+              {
+                "name": "Crunch!",
+                "description": "Increases stagger effect when landing on enemies using Leap by 100.0%."
+              },
+              {
+                "name": "Dawi-Drop",
+                "description": "Increases attack damage while airborne during Leap by 150.0%."
+              },
+              {
+                "name": "No Escape",
+                "description": "Leap's attack speed buff also increases movement speed by 25.0% for the duration."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "outcast-engineer",
+          "name": "Outcast Engineer",
+          "primary": [
+            "bardin-hammer",
+            "bardin-war-pick",
+            "bardin-axe-and-shield",
+            "bardin-axe",
+            "bardin-hammer-and-shield",
+            "bardin-dual-hammers",
+            "bardin-great-axe",
+            "bardin-cog-hammer",
+            "bardin-great-hammer"
+          ],
+          "secondary": [
+            "bardin-handgun",
+            "bardin-trollhammer-torpedo",
+            "bardin-drakegun",
+            "bardin-drakefire-pistols",
+            "bardin-masterwork-pistol",
+            "bardin-grudge-raker"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Ingenious Ordnance",
+                "description": "Bardin crafts a Bomb every 80 seconds. Crafted Bombs are less effective than normal bombs. In addition, Bardin's explosives no longer damage his allies."
+              },
+              {
+                "name": "Armour Piercing Slugs",
+                "description": "Non-Explosive Ranged Attacks pierce 1 additional enemies."
+              },
+              {
+                "name": "Bombardier",
+                "description": "Bardin's Bombs gain the effect of both regular Bombs and Incendiary Bombs. Bardin now begins a mission with 3 Bombs."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Full Head of Steam",
+                "description": "While at 5 stacks of Pressure, Bardin gains 15% Attack Speed."
+              },
+              {
+                "name": "Perilous Overclock",
+                "description": "Building Pressure at Max stacks grants up to 3 stacks of Overclock. Each stack of Overclock restores 25% charge, grants 8% Critical Hit chance and damages Bardin for 4/8/10 respectively."
+              },
+              {
+                "name": "Superior Gaskets",
+                "description": "Pressure is now lost when firing instead of over time. Each stack of Pressure grants 4% power."
+              }
+            ],
+            [
+              {
+                "name": "Ablative Armour",
+                "description": "Every 5 seconds Bardin gains a stack of Damage Reduction. Stacks up to 5 times. Each stack reduces damage taken by 5%. Taking damage removes a stack."
+              },
+              {
+                "name": "Combined Arms",
+                "description": "Melee Power is increased by 10%. Each 5 Melee hit makes Bardin's next Ranged Attack grant 15% Ranged Power for 10 seconds."
+              },
+              {
+                "name": "Piston Power",
+                "description": "Every 15 seconds Bardin's next Charged Attack gains massive stagger and restores all stamina."
+              }
+            ],
+            [
+              {
+                "name": "Gromril-Plated Shot",
+                "description": "Reduces the Steam-Assisted Crank Gun (Mk II)'s rate of fire, but increases Damage and Armour Penetration."
+              },
+              {
+                "name": "Linked Compression Chamber",
+                "description": "The Steam-Assisted Crank Gun (Mk II) starts firing at full speed, rather than taking time to ramp up. Also grants +30% firing speed (unlisted)."
+              },
+              {
+                "name": "Innovative Ammo Hoppers",
+                "description": "Increases Bardin's Ability Bar by 50%. Killing a Special makes the Steam-Assisted Crank Gun (Mk II) not consume the Ability Bar for the next 4 seconds."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kerillian",
+      "name": "Kerillian",
+      "careers": [
+        {
+          "id": "waystalker",
+          "name": "Waystalker",
+          "primary": [
+            "kerillian-sword-and-dagger",
+            "kerillian-dual-daggers",
+            "kerillian-glaive",
+            "kerillian-sword",
+            "kerillian-elven-spear",
+            "kerillian-elven-axe",
+            "kerillian-dual-swords",
+            "kerillian-two-handed-sword"
+          ],
+          "secondary": [
+            "kerillian-moonfire-bow",
+            "kerillian-hagbane-shortbow",
+            "kerillian-briar-javelin",
+            "kerillian-swift-bow",
+            "kerillian-longbow"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Blood Shot",
+                "description": "After killing an enemy with a melee attack Kerillian fires an additional arrow with her next ranged attack made within 10 seconds."
+              },
+              {
+                "name": "Serrated Shots",
+                "description": "Regular arrows cause enemies to bleed for extra damage."
+              },
+              {
+                "name": "Drakira's Alacrity",
+                "description": "Ranged headshots increases attack speed by 15.0% for 5 seconds."
+              }
+            ],
+            [
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Assassin",
+                "description": "Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Headshots and critical hits instead inflict 40% bonus damage, as do strikes against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Isha's Embrace",
+                "description": "Increases Kerillian's health regenerated from Amaranthe by 50.0%."
+              },
+              {
+                "name": "Spirit Arrows",
+                "description": "Amaranthe reduces the cooldown of Trueflight Volley by 5.0% every tick. No longer restores health."
+              },
+              {
+                "name": "Rejuvenating Locus",
+                "description": "Amaranthe also affects the other members of the party."
+              }
+            ],
+            [
+              {
+                "name": "Fervent Huntress",
+                "description": "Killing a special or elite enemy increases movement speed by 15.0% for 10 seconds."
+              },
+              {
+                "name": "Ricochet",
+                "description": "Kerillian's arrows now ricochet, each bouncing up to 3 times or until it hits an enemy."
+              },
+              {
+                "name": "Asrai Focus",
+                "description": "Reduces the cooldown of Trueshot Volley by 20.0%."
+              }
+            ],
+            [
+              {
+                "name": "Piercing Shot",
+                "description": "Trueshot Volley fires one piercing shot dealing heavy damage. Headshot refunds 100.0% cooldown."
+              },
+              {
+                "name": "Loaded Bow",
+                "description": "Trueflight Volley fires an additional arrow."
+              },
+              {
+                "name": "Kurnous' Reward",
+                "description": "Killing a special or elite enemy with Trueflight Volley restores 30.0% ammunition."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "handmaiden",
+          "name": "Handmaiden",
+          "primary": [
+            "kerillian-sword-and-dagger",
+            "kerillian-dual-daggers",
+            "kerillian-glaive",
+            "kerillian-sword",
+            "kerillian-spear-and-shield",
+            "kerillian-elven-spear",
+            "kerillian-elven-axe",
+            "kerillian-dual-swords",
+            "kerillian-two-handed-sword"
+          ],
+          "secondary": [
+            "kerillian-moonfire-bow",
+            "kerillian-hagbane-shortbow",
+            "kerillian-briar-javelin",
+            "kerillian-swift-bow",
+            "kerillian-longbow"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              }
+            ],
+            [
+              {
+                "name": "Focused Spirit",
+                "description": "After not taking damage for 10 seconds, increases Kerillian's power by 15.0%. Reset upon taking damage."
+              },
+              {
+                "name": "Oak Stance",
+                "description": "Increases critical strike chance by 5.0%."
+              },
+              {
+                "name": "Asrai Alacrity",
+                "description": "Blocking an attack or pushing an enemy grants the next two strikes 30% attack speed and 10% power. The buff lasts indefinitely, but does not stack. The buff is applied to any melee or ranged attack that hits an enemy. However, the buff is only consumed when hitting an enemy with a melee attack, or hitting a Skaven Special with a ranged attack."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Willow Stance",
+                "description": "Dodging grants 5.0% attack speed for 6 seconds. Stacks up to 3 times."
+              },
+              {
+                "name": "Dance of Blades",
+                "description": "Dodging while blocking increases dodge range by 20%. Dodging while not blocking increases Kerillian's power by 10% for 2 seconds."
+              },
+              {
+                "name": "Wraith-Walk",
+                "description": "Kerillian's dodges can now pass through enemies."
+              }
+            ],
+            [
+              {
+                "name": "Heart of Oak",
+                "description": "Increases max health by 15.0%."
+              },
+              {
+                "name": "Birch Stance",
+                "description": "Reduces block cost by 30.0%."
+              },
+              {
+                "name": "Quiver of Plenty",
+                "description": "Increases ammunition amount by 40.0%."
+              }
+            ],
+            [
+              {
+                "name": "Gift of Ladrielle",
+                "description": "Kerillian disappears from enemy perception for 2 seconds after using Dash."
+              },
+              {
+                "name": "Bladedancer",
+                "description": "Dashing through an enemy causes them to bleed for significant damage over time."
+              },
+              {
+                "name": "Power from Pain",
+                "description": "Each enemy hit with Dash grants 5.0% critical strike chance for 15 seconds. Stacks up to 5 times."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "shade",
+          "name": "Shade",
+          "primary": [
+            "kerillian-sword-and-dagger",
+            "kerillian-dual-daggers",
+            "kerillian-glaive",
+            "kerillian-sword",
+            "kerillian-elven-spear",
+            "kerillian-elven-axe",
+            "kerillian-dual-swords",
+            "kerillian-two-handed-sword"
+          ],
+          "secondary": [
+            "kerillian-moonfire-bow",
+            "kerillian-hagbane-shortbow",
+            "kerillian-volley-crossbow",
+            "kerillian-briar-javelin",
+            "kerillian-swift-bow",
+            "kerillian-longbow"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Cruelty",
+                "description": "Increases critical strike damage bonus by 50.0%."
+              },
+              {
+                "name": "Exploit Weakness",
+                "description": "Increases damage by 20.0% to poisoned or bleeding enemies."
+              },
+              {
+                "name": "Exquisite Huntress",
+                "description": "Headshots increases headshot damage bonus by 10.0% for 10 seconds. Stacks up to 10 times."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Assassin",
+                "description": "Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Headshots and critical hits instead inflict 40% bonus damage, as do strikes against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Chain Killer",
+                "description": "Successive Charged Backstabs increase Backstab Damage by 25% for 5 seconds. This effect can stack up to 2 times."
+              },
+              {
+                "name": "Focused Slaying",
+                "description": "Killing an enemy with a Backstab grants Cooldown reduction for 3 seconds."
+              },
+              {
+                "name": "Bloodfletcher",
+                "description": "Backstabs return 1 bolt or arrow. 2 second cooldown."
+              }
+            ],
+            [
+              {
+                "name": "Blood Drinker",
+                "description": "Critical hits reduces damage taken by 20.0% for 5 seconds."
+              },
+              {
+                "name": "Spring-Heeled Assassin",
+                "description": "Critical hits increases movement speed by 20.0% for 5 seconds."
+              },
+              {
+                "name": "Gladerunner",
+                "description": "Increases movement speed by 10.0%."
+              }
+            ],
+            [
+              {
+                "name": "Shimmer Strike",
+                "description": "Leaving Infiltrate grants Kerillian Stealth for 3 seconds. Killing an elite or a special enemy extends this effect by 1 second."
+              },
+              {
+                "name": "Hungry Wind",
+                "description": "Leaving Infiltrate grants Kerillian 10% movement speed and 15% Power with the ability to pass through enemies for 10 seconds. Infiltrate no longer grants bonus damage."
+              },
+              {
+                "name": "Cloak of Pain",
+                "description": "When the initial Infiltrate ends, a second (and final) Infiltrate is triggered."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "sister-of-the-thorn",
+          "name": "Sister of the Thorn",
+          "primary": [
+            "kerillian-sword-and-dagger",
+            "kerillian-dual-daggers",
+            "kerillian-glaive",
+            "kerillian-sword",
+            "kerillian-elven-spear",
+            "kerillian-elven-axe",
+            "kerillian-dual-swords",
+            "kerillian-two-handed-sword"
+          ],
+          "secondary": [
+            "kerillian-moonfire-bow",
+            "kerillian-deepwood-staff",
+            "kerillian-hagbane-shortbow",
+            "kerillian-briar-javelin",
+            "kerillian-swift-bow",
+            "kerillian-longbow"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Surge of Malice",
+                "description": "While above 90% health Kerilian gains 15% Attack Speed."
+              },
+              {
+                "name": "Atharti's Delight",
+                "description": "Melee strikes against Poisoned targets make them bleed."
+              },
+              {
+                "name": "Briar's Malice",
+                "description": "Casting Thornwake grants Kerillian 2 critical strikes."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Incandescence",
+                "description": "Radiance can stack 2 times."
+              },
+              {
+                "name": "Bonded Spirit",
+                "description": "Reduce the cooldown of Radiance by 50%. Taking damage increases the cooldown by 2 seconds."
+              },
+              {
+                "name": "Radiant Inheritance",
+                "description": "Consuming Radiance grants Kerillian and nearby allies 15% power and 5% critical strike chance for 10 seconds."
+              }
+            ],
+            [
+              {
+                "name": "Recursive Toxin",
+                "description": "Blackvenom effects can now stack 2 times."
+              },
+              {
+                "name": "Lingering Blackvenom",
+                "description": "Critical Strikes apply Blackvenom to enemies near the target."
+              },
+              {
+                "name": "Repel",
+                "description": "Pushing at full stamina increases the strength and range of the push by 100%."
+              }
+            ],
+            [
+              {
+                "name": "Ironbark Thicket",
+                "description": "Increase the width of the Thorn Wall and its duration to 10 seconds."
+              },
+              {
+                "name": "Tanglegrasp Thicket",
+                "description": "Thorny vines now erupt from Kerillian and travel towards the targeted area. Enemies hit are dragged towards the target area."
+              },
+              {
+                "name": "Blackvenom Thicket",
+                "description": "Thornwake instead causes roots to burst from the ground, staggering enemies and applying Blackvenom to them."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "saltzpyre",
+      "name": "Victor Saltzpyre",
+      "careers": [
+        {
+          "id": "witch-hunter-captain",
+          "name": "Witch Hunter Captain",
+          "primary": [
+            "saltzpyre-greatsword",
+            "saltzpyre-flail",
+            "saltzpyre-axe",
+            "saltzpyre-bill-hook",
+            "saltzpyre-falchion",
+            "saltzpyre-axe-and-falchion",
+            "saltzpyre-rapier"
+          ],
+          "secondary": [
+            "saltzpyre-crossbow",
+            "saltzpyre-griffon-foot",
+            "saltzpyre-volley-crossbow",
+            "saltzpyre-repeater-pistol",
+            "saltzpyre-brace-of-pistols"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Riposte",
+                "description": "Blocking just as an enemy attack is about to hit causes your next melee or ranged attack within 2 seconds to be a guaranteed critical hit."
+              },
+              {
+                "name": "Deathknell",
+                "description": "Increases headshot damage bonus by 50.0%."
+              },
+              {
+                "name": "Flense",
+                "description": "Enemies hit by melee attacks bleed for extra damage."
+              }
+            ],
+            [
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Assassin",
+                "description": "Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Headshots and critical hits instead inflict 40% bonus damage, as do strikes against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Templar's Knowledge",
+                "description": "Witch Hunt causes enemies to take an additional 5.0% damage."
+              },
+              {
+                "name": "Heretic Sighted",
+                "description": "Tagging an enemy increases attack speed by 10.0% for 15 seconds."
+              },
+              {
+                "name": "Wild Fervour",
+                "description": "Witch-Hunt grants 5.0% increased critical hit chance to the entire party for 5 seconds when taggable enemies die."
+              }
+            ],
+            [
+              {
+                "name": "Charmed Life",
+                "description": "Increases dodge range by 20.0%."
+              },
+              {
+                "name": "Cast Away",
+                "description": "Pushing an enemy increases stamina regeneration by 40.0% for 2 seconds."
+              },
+              {
+                "name": "Always Prepared",
+                "description": "Increases max ammunition by 30.0%."
+              }
+            ],
+            [
+              {
+                "name": "I Shall Judge You All!",
+                "description": "Applies Witch Hunt to enemies hit by Animosity."
+              },
+              {
+                "name": "Fervency",
+                "description": "Animosity grants Victor guaranteed melee critical strikes for the duration. No longer affects teammates."
+              },
+              {
+                "name": "The Unending Hunt",
+                "description": "Hitting 10 or more enemies with Animosity refunds 40.0% cooldown."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "bounty-hunter",
+          "name": "Bounty Hunter",
+          "primary": [
+            "saltzpyre-greatsword",
+            "saltzpyre-flail",
+            "saltzpyre-axe",
+            "saltzpyre-bill-hook",
+            "saltzpyre-falchion",
+            "saltzpyre-axe-and-falchion",
+            "saltzpyre-rapier"
+          ],
+          "secondary": [
+            "saltzpyre-crossbow",
+            "saltzpyre-griffon-foot",
+            "saltzpyre-volley-crossbow",
+            "saltzpyre-repeater-pistol",
+            "saltzpyre-brace-of-pistols"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Open Wounds",
+                "description": "Critical hits cause enemies to take 20% increased damage for 15 seconds. Does not stack with similar effects."
+              },
+              {
+                "name": "Steel Crescendo",
+                "description": "When his ranged weapon is empty, Victor gains 15% Melee Power and 15% Attack Speed for 10 seconds."
+              },
+              {
+                "name": "Weight of Fire",
+                "description": "Ranged weapon magazine size increases ranged power level by 1.0% for each ammunition available."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Assassin",
+                "description": "Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Headshots and critical hits instead inflict 40% bonus damage, as do strikes against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Blessed Combat",
+                "description": "Melee strikes make up to the next 6 ranged shots deal 15.0% more damage. Ranged hits makes up to the next 6 melee strikes deal 15.0% more damage. Melee kills reset the cooldown for Blessed Shots."
+              },
+              {
+                "name": "Cruel Fortune",
+                "description": "Reduces cooldown on Blessed Shots to 6 seconds."
+              },
+              {
+                "name": "Prize Bounty",
+                "description": "Shots affected by Blessed Shots consume no ammunition."
+              }
+            ],
+            [
+              {
+                "name": "Rile the Mob",
+                "description": "Ranged critical hits grant Victor and his allies 10.0% movement speed for 10 seconds."
+              },
+              {
+                "name": "Salvaged Ammunition",
+                "description": "Killing an elite while out of ammunition restores 20% of max ammo. Melee kills reload 1 ammo into Victor's ranged weapon."
+              },
+              {
+                "name": "Job Well Done",
+                "description": "Killing an elite or special enemy grants 1.0% damage reduction buff, stacking up to 30 times. Lasts until end of mission or death."
+              }
+            ],
+            [
+              {
+                "name": "Just Reward",
+                "description": "Ranged critical hits reduces the cooldown of Locked and Loaded by 20%. Can only trigger once every 10 seconds."
+              },
+              {
+                "name": "Double-shotted",
+                "description": "Modifies Victor's sidearm to fire two powerful bullets in a straight line. Scoring a headshot with this attack reduces the cooldown of Locked and Loaded by 60%. Even though two bullets are shot, this cooldown reduction can only apply once."
+              },
+              {
+                "name": "Indiscriminate Blast",
+                "description": "Modifies Victor's sidearm to fire two blasts of shield-penetrating pellets in a devastating cone. Each kill with the blast increases the amount of pellets in the next blast, to a max of 20. This buff resets every time you use your ult, unless every pellet misses an enemy. Victor also gains 25% cooldown reduction."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "zealot",
+          "name": "Zealot",
+          "primary": [
+            "saltzpyre-greatsword",
+            "saltzpyre-flail",
+            "saltzpyre-axe",
+            "saltzpyre-bill-hook",
+            "saltzpyre-falchion",
+            "saltzpyre-axe-and-falchion",
+            "saltzpyre-rapier",
+            "saltzpyre-skull-splitter-hammer",
+            "saltzpyre-holy-great-hammer",
+            "saltzpyre-paired-skull-splitters"
+          ],
+          "secondary": [
+            "saltzpyre-crossbow",
+            "saltzpyre-griffon-foot",
+            "saltzpyre-volley-crossbow",
+            "saltzpyre-repeater-pistol",
+            "saltzpyre-brace-of-pistols"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              }
+            ],
+            [
+              {
+                "name": "Castigate",
+                "description": "Increases attack speed by 10.0% while below 50.0% health. Double effect while below 20.0% health."
+              },
+              {
+                "name": "Smite",
+                "description": "Every 5 hits grant a guaranteed critical strike. Critical strikes can no longer occur randomly."
+              },
+              {
+                "name": "Unbending Purpose",
+                "description": "Increases power by 5.0%."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Crusade",
+                "description": "Each stack of Fiery Faith also increases movement speed by 5.0%."
+              },
+              {
+                "name": "Holy Fortitude",
+                "description": "Each stack of Fiery Faith also increases healing received by 15.0%."
+              },
+              {
+                "name": "Armour of Faith",
+                "description": "Each stack of Fiery Faith also reduces damage taken by 5.0%."
+              }
+            ],
+            [
+              {
+                "name": "Devotion",
+                "description": "Taking damage increases movement speed by 30.0% for 2 seconds. Getting attacked no longer slows movement speed."
+              },
+              {
+                "name": "Redemption through Blood",
+                "description": "Taking damage restores stamina to full."
+              },
+              {
+                "name": "Calloused Without and Within",
+                "description": "Damage taken reduced by 10.0%."
+              }
+            ],
+            [
+              {
+                "name": "Faith's Flurry",
+                "description": "Attacks during Holy Fervour increase power by 2.0% for 5 seconds. Stacks up to 10 times."
+              },
+              {
+                "name": "Feel Nothing",
+                "description": "Health can't be reduced below 1 for the duration of Holy Fervour."
+              },
+              {
+                "name": "Flagellant's Zeal",
+                "description": "Each hit during Holy Fervour grants a stack up to 10. Each stack reduces the cooldown of Holy Fervour by 5.0% when the buff fades."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "warrior-priest-of-sigmar",
+          "name": "Warrior Priest of Sigmar",
+          "primary": [
+            "saltzpyre-skull-splitter-hammer",
+            "saltzpyre-holy-great-hammer",
+            "saltzpyre-skull-splitter-shield",
+            "saltzpyre-paired-skull-splitters",
+            "saltzpyre-skull-splitter-blessed-tome",
+            "saltzpyre-flail-shield"
+          ],
+          "secondary": [
+            "saltzpyre-skull-splitter-hammer",
+            "saltzpyre-holy-great-hammer",
+            "saltzpyre-skull-splitter-shield",
+            "saltzpyre-paired-skull-splitters",
+            "saltzpyre-skull-splitter-blessed-tome",
+            "saltzpyre-flail-shield"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Unstoppable Force",
+                "description": "Striking 3 enemies in a single attack halves the cost of pushing for 4 seconds"
+              },
+              {
+                "name": "Rising Judgement",
+                "description": "Hits increase the power of the next charged attack by 8%. Max stacks 5."
+              },
+              {
+                "name": "Sigmar's Executioner",
+                "description": "Killing an elite enemy grants 5% critical strike chance for 12 seconds. Max stacks 3."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Blazing Bright",
+                "description": "Taking damage grants Victor Fury. Entering Righteous Fury grants Victor Shield of Faith."
+              },
+              {
+                "name": "See my Wrath",
+                "description": "Shield of Faith grants Victor 60% Fury. Smite now deals 40% of the attack's damage."
+              },
+              {
+                "name": "From Fury, Fortitude",
+                "description": "Each kill now grants 2% Fury and during Righteous Fury restores Health to the party."
+              }
+            ],
+            [
+              {
+                "name": "Prayer of Vengence",
+                "description": "Bless the party with 15% power versus Monsters."
+              },
+              {
+                "name": "Prayer of Might",
+                "description": "Bless the party with 25% increased Stagger Power."
+              },
+              {
+                "name": "Prayer of Hardiness",
+                "description": "Bless the party with 15% increased Max Health."
+              }
+            ],
+            [
+              {
+                "name": "Unyielding Blessing",
+                "description": "Shield of Faith now lasts 10 seconds. The shielded hero's attacks cause the shield to pulse, staggering nearby enemies."
+              },
+              {
+                "name": "United in Prayer",
+                "description": "Shield of Faith always affects Victor as well."
+              },
+              {
+                "name": "The Comet's Gift",
+                "description": "Shield of Faith revives and heals an amount equal to all Damage suffered last 3 seconds."
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sienna",
+      "name": "Sienna Fuegonasus",
+      "careers": [
+        {
+          "id": "battle-wizard",
+          "name": "Battle Wizard",
+          "primary": [
+            "sienna-crowbill",
+            "sienna-sword",
+            "sienna-mace",
+            "sienna-fire-sword",
+            "sienna-flaming-flail",
+            "sienna-dagger",
+            "sienna-ensorcelled-reaper"
+          ],
+          "secondary": [
+            "sienna-beam-staff",
+            "sienna-flamestorm-staff",
+            "sienna-coruscation-staff",
+            "sienna-fireball-staff",
+            "sienna-bolt-staff",
+            "sienna-conflagration-staff"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Volcanic Force",
+                "description": "Fully charging a spell increases its power by 50.0%."
+              },
+              {
+                "name": "Famished Flames",
+                "description": "Burning damage over time is increased by 100.0%. All non-burn damage is reduced by 15.0%."
+              },
+              {
+                "name": "Lingering Flames",
+                "description": "Sienna's burning effects now last until the affected enemy dies. Burning effects do not stack."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Unusually Calm",
+                "description": "Tranquility cooldown is reduced to 3 seconds."
+              },
+              {
+                "name": "Rechannel",
+                "description": "When Tranquillity is active, Sienna's ranged charge time is reduced by 40.0%."
+              },
+              {
+                "name": "Centred",
+                "description": "Increases the venting effect of Tranquillity by 100.0%."
+              }
+            ],
+            [
+              {
+                "name": "Soot Shield",
+                "description": "Igniting an enemy reduces damage taken by 8.0% for 5 seconds. Stacks up to 3 times."
+              },
+              {
+                "name": "Fires from Ash",
+                "description": "Killing a burning enemy reduces the cooldown of Fire Walk by 3%. 0.5 second cooldown."
+              },
+              {
+                "name": "Immersive Immolation",
+                "description": "Hitting 4 or more enemies with one attack grants 15.0% increased attack speed for 5 seconds."
+              }
+            ],
+            [
+              {
+                "name": "Volans' Quickening",
+                "description": "Reduces the cooldown of Fire Walk by 40.0%."
+              },
+              {
+                "name": "Kaboom!",
+                "description": "Fire Walk explosion radius and burn damage increased. No longer leaves a burning trail."
+              },
+              {
+                "name": "Burnout",
+                "description": "Fire Walk can be activated a second time within 10 seconds."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "pyromancer",
+          "name": "Pyromancer",
+          "primary": [
+            "sienna-crowbill",
+            "sienna-sword",
+            "sienna-mace",
+            "sienna-fire-sword",
+            "sienna-flaming-flail",
+            "sienna-dagger",
+            "sienna-ensorcelled-reaper"
+          ],
+          "secondary": [
+            "sienna-beam-staff",
+            "sienna-flamestorm-staff",
+            "sienna-coruscation-staff",
+            "sienna-fireball-staff",
+            "sienna-bolt-staff",
+            "sienna-conflagration-staff"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              }
+            ],
+            [
+              {
+                "name": "Ride the Fire Wind",
+                "description": "Increases ranged power level by 1.0% every 1 seconds up to a maximum of 25 stacks. Upon reaching maximum stacks effect diminishes then starts over."
+              },
+              {
+                "name": "Martial Study",
+                "description": "Increases attack speed by 5.0%."
+              },
+              {
+                "name": "Spirit-Casting",
+                "description": "Increases critical strike chance by 10.0% while above 80.0% health."
+              }
+            ],
+            [
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Deathly Dissipation",
+                "description": "Killing a special stops your spells from generating overcharge for 12 seconds."
+              },
+              {
+                "name": "On the Precipice",
+                "description": "Increases ranged power by 20% when at or above 75% overcharge."
+              },
+              {
+                "name": "One with the Flame",
+                "description": "Critical Mass also increases attack speed by 2.0% per 9 overcharge and stacks up to 5 times."
+              }
+            ],
+            [
+              {
+                "name": "Soul Siphon",
+                "description": "Reduces damage taken by 10% for 10 seconds after killing a special or elite enemy. Stacks up to 3 times."
+              },
+              {
+                "name": "Flamestrike's Tutelage",
+                "description": "Sienna gains 80% reduction on Venting damage. Each nearby enemy decreases the damage reduction by 20%."
+              },
+              {
+                "name": "Fleetflame",
+                "description": "Critical hits increases movement speed by 5.0% for 10 seconds. Stacks up to 3 times."
+              }
+            ],
+            [
+              {
+                "name": "Dissipating Rictus",
+                "description": "The Burning Head grants 50% charge speed and Overcharge explosion immunity for 12 seconds."
+              },
+              {
+                "name": "Bonded Flame",
+                "description": "The Burning Head grants 35 temporary health when used."
+              },
+              {
+                "name": "Blazing Echo",
+                "description": "The Burning Head critical hits refund its cooldown."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "unchained",
+          "name": "Unchained",
+          "primary": [
+            "sienna-crowbill",
+            "sienna-sword",
+            "sienna-mace",
+            "sienna-fire-sword",
+            "sienna-flaming-flail",
+            "sienna-dagger",
+            "sienna-ensorcelled-reaper"
+          ],
+          "secondary": [
+            "sienna-beam-staff",
+            "sienna-flamestorm-staff",
+            "sienna-coruscation-staff",
+            "sienna-fireball-staff",
+            "sienna-bolt-staff",
+            "sienna-conflagration-staff"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Second Wind",
+                "description": "Staggering enemies with a Melee Attack grants up to 2 Temporary Health determined by the Stagger Strength. Killing blows instead restore 0.25."
+              },
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              }
+            ],
+            [
+              {
+                "name": "Frenzied Flame",
+                "description": "Increases attack speed by 15% while at or above 50% Overcharge"
+              },
+              {
+                "name": "Outburst",
+                "description": "Pushing an enemy ignites them, causing damage over time. Heavy attacks makes the next push arc 70.0% wider."
+              },
+              {
+                "name": "Chain Reaction",
+                "description": "Burning enemies have a small chance to explode on death."
+              }
+            ],
+            [
+              {
+                "name": "Bulwark",
+                "description": "Enemies that you stagger take 10% more damage from melee attacks for 2 seconds.Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Dissipate",
+                "description": "Block cost is reduced by 50.0% when Overcharged and blocking attacks vent Overcharge. Applied after other block cost reductions."
+              },
+              {
+                "name": "Conduit",
+                "description": "Increases rate of venting overcharge by 30.0% and reduces damage taken from venting by 50.0%."
+              },
+              {
+                "name": "Numb to Pain",
+                "description": "Reduces damage taken by 5.0% and overcharge generated by Blood Magic by 16.6% for 15 seconds after venting. Stacks 3 times."
+              }
+            ],
+            [
+              {
+                "name": "Enfeebling Flames",
+                "description": "Burning enemies deal 30.0% less damage."
+              },
+              {
+                "name": "Abandon",
+                "description": "When Sienna overcharges she starts, 4 times per second, exchanging 1/20 of her health for 10% ability cooldown."
+              },
+              {
+                "name": "Natural Talent",
+                "description": "Reduces overcharge generated by 10.0%."
+              }
+            ],
+            [
+              {
+                "name": "Fuel for the Fire",
+                "description": "Each enemy hit by Living Bomb increases power by 5.0% for 15 seconds. Stacks up to 5 times."
+              },
+              {
+                "name": "Wildfire",
+                "description": "Living Bomb grants Sienna a scorching aura that ignites nearby enemies for 10 seconds, causing damage over time. Increases the stagger power of Living Bomb."
+              },
+              {
+                "name": "Bomb Balm",
+                "description": "Living Bomb restores 30 temporary health to allies."
+              }
+            ]
+          ]
+        },
+        {
+          "id": "necromancer",
+          "name": "Necromancer",
+          "primary": [
+            "sienna-crowbill",
+            "sienna-sword",
+            "sienna-mace",
+            "sienna-fire-sword",
+            "sienna-flaming-flail",
+            "sienna-dagger",
+            "sienna-ensorcelled-reaper"
+          ],
+          "secondary": [
+            "sienna-beam-staff",
+            "sienna-coruscation-staff",
+            "sienna-fireball-staff",
+            "sienna-bolt-staff",
+            "sienna-conflagration-staff",
+            "sienna-soulstealer-staff"
+          ],
+          "talents": [
+            [
+              {
+                "name": "Carve",
+                "description": "Damaging multiple enemies in one Melee Attack grants Temporary Health."
+              },
+              {
+                "name": "Execute",
+                "description": "Killing an enemy with a Melee Attack restores Temporary Health. Killing more dangerous enemies grants more Temporary Health."
+              },
+              {
+                "name": "Sting",
+                "description": "Melee Strikes restore 0.5 Temporary Health. Melee Critical Strikes and Headshots instead restore 2. Critical Headshots instead restore 4."
+              }
+            ],
+            [
+              {
+                "name": "Vanhel's Danse Macabre",
+                "description": "12% attack speed when 4 or more skeletons are raised."
+              },
+              {
+                "name": "Death Ascendent",
+                "description": "Casting spells grants 5% ranged power for 6 seconds. Max stacks 5."
+              },
+              {
+                "name": "Reaping",
+                "description": "Critical attacks have 25% power and unlimited cleave."
+              }
+            ],
+            [
+              {
+                "name": "Mainstay",
+                "description": "Deal 40% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 60% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Smiter",
+                "description": "The first enemy hit always counts as staggered. Deal 20% more damage to staggered enemies. Each hit against a staggered enemy adds another count of stagger. Bonus damage is increased to 40% against enemies afflicted by more than one stagger effect."
+              },
+              {
+                "name": "Enhanced Power",
+                "description": "Increases total Power Level by 7.5%. This is calculated before other buffs are applied."
+              }
+            ],
+            [
+              {
+                "name": "Cursed Blood",
+                "description": "Critical attacks against enemies afflicted by the Malediction of Nagash cause them to burst, damaging nearby enemies based on the damage of the attack."
+              },
+              {
+                "name": "Soul Harvest",
+                "description": "The Malediction of Nagash rips the soul from targets that die. Harvesting 8 souls causes the next attack to be a guaranteed Critical Hit."
+              },
+              {
+                "name": "Withering Touch",
+                "description": "On releasing a Skeleton, all Sienna's attacks for the next 15 seconds ignite enemies, causing damage over time."
+              }
+            ],
+            [
+              {
+                "name": "Spirit Leech",
+                "description": "Killing an elite enemy restore 15% cooldown."
+              },
+              {
+                "name": "Curse of the Undeath",
+                "description": "Casting Raise Dead reduces damage inflicted on Sienna by 80% for the next 3 hits."
+              },
+              {
+                "name": "Lost Souls",
+                "description": "Venting 12% overcharge unleashes a soul that steals health from a nearby enemy restoring 2 temporary health."
+              }
+            ],
+            [
+              {
+                "name": "Army of the Dead",
+                "description": "Raise Dead reanimates 6 additional skeletons that decay after 20 seconds."
+              },
+              {
+                "name": "Barrow Blades",
+                "description": "Skeletons now carry two cursed blades. When raised, and when attacking, they ignite enemies, causing damage over time."
+              },
+              {
+                "name": "Dread Seneschal",
+                "description": "Increase Skeleton health and damage by 50%. Command Attack now orders a charge. Command Defend can be issued simultaneously."
+              }
+            ]
+          ]
+        }
+      ]
+    }
+  ],
+  "weapons": [
+    {
+      "id": "kruber-mace",
+      "name": "Mace",
+      "keywords": "Fast Attacks, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-sword",
+      "name": "Sword",
+      "keywords": "Fast Attacks, Wide Sweeps, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-executioner-sword",
+      "name": "Executioner Sword",
+      "keywords": "Headshotting, Wide Sweeps, High Damage",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-sword-and-shield",
+      "name": "Sword and Shield",
+      "keywords": "Fast Attacks, Wide Sweeps, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-mace-and-shield",
+      "name": "Mace and Shield",
+      "keywords": "Wide Sweeps, Crowd Control, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-bretonnian-longsword",
+      "name": "Bretonnian Longsword",
+      "keywords": "High Damage, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-mace-and-sword",
+      "name": "Mace and Sword",
+      "keywords": "High Damage, Fast Attacks, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-spear-and-shield",
+      "name": "Spear and Shield",
+      "keywords": "Fast Attacks, Wide Sweeps, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-tuskgor-spear",
+      "name": "Tuskgor Spear",
+      "keywords": "Fast Attacks, Versatile, High Agility",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-halberd",
+      "name": "Halberd",
+      "keywords": "Wide Sweeps, Armour Piercing, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-greatsword",
+      "name": "Greatsword",
+      "keywords": "High Damage, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-two-handed-hammer",
+      "name": "Two-Handed Hammer",
+      "keywords": "Wide Sweeps, Crowd Control, Armour Piercing",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kruber-handgun",
+      "name": "Handgun",
+      "keywords": "High Damage, Sniper, Headshotting",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kruber-repeater-handgun",
+      "name": "Repeater Handgun",
+      "keywords": "Rapid Fire, Armour Piercing, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kruber-blunderbuss",
+      "name": "Blunderbuss",
+      "keywords": "High Damage, Crowd Control, Close Range",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kruber-longbow",
+      "name": "Longbow",
+      "keywords": "High Damage, Sniper, Armour Piercing",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kruber-bretonnian-sword-and-shield",
+      "name": "Bretonnian Sword and Shield",
+      "keywords": "Fast Attacks, Wide Sweeps, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-hammer",
+      "name": "Hammer",
+      "keywords": "Fast Attacks, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-war-pick",
+      "name": "War Pick",
+      "keywords": "Wide Sweeps, Crowd Control, Heavy Charge",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-axe-and-shield",
+      "name": "Axe and Shield",
+      "keywords": "High Damage, Armour Piercing, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-axe",
+      "name": "Axe",
+      "keywords": "High Damage, Armour Piercing, Shield Breaking",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-hammer-and-shield",
+      "name": "Hammer and Shield",
+      "keywords": "Wide Sweeps, Crowd Control, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-dual-hammers",
+      "name": "Dual Hammers",
+      "keywords": "Crowd Control, Fast Attacks, Wide Sweeps",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-great-axe",
+      "name": "Great Axe",
+      "keywords": "High Damage, Shield Breaking, Armour Piercing",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-cog-hammer",
+      "name": "Cog Hammer",
+      "keywords": "High Damage, Shield Breaking, Armour Piercing",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-great-hammer",
+      "name": "Great Hammer",
+      "keywords": "Wide Sweeps, Crowd Control, Armour Piercing",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "bardin-handgun",
+      "name": "Handgun",
+      "keywords": "High Damage, Sniper, Headshotting",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-throwing-axes",
+      "name": "Throwing Axes",
+      "keywords": "Armour Piercing, Sniper, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-crossbow",
+      "name": "Crossbow",
+      "keywords": "High Damage, Sniper, Piercing Bolts",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-masterwork-pistol",
+      "name": "Masterwork Pistol",
+      "keywords": "High Damage, Rapid Fire, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-grudge-raker",
+      "name": "Grudge-Raker",
+      "keywords": "High Damage, Crowd Control, Close Range",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-trollhammer-torpedo",
+      "name": "Trollhammer Torpedo",
+      "keywords": "High Damage, Sniper, Piercing Bolts",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-drakegun",
+      "name": "Drakegun",
+      "keywords": "Crowd Control, Close Range, Overheat",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-drakefire-pistols",
+      "name": "Drakefire Pistols",
+      "keywords": "Overheat, Crowd Control, Damage Over Time",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "bardin-dual-axes",
+      "name": "Dual Axes",
+      "keywords": "High Damage, Fast Attacks, Armour Piercing",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-sword-and-dagger",
+      "name": "Sword and Dagger",
+      "keywords": "Fast Attacks, Wide Sweeps, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-dual-daggers",
+      "name": "Dual Daggers",
+      "keywords": "Fast Attacks, Headshotting, Damage Over Time",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-glaive",
+      "name": "Glaive",
+      "keywords": "High Damage, Armour Piercing, Fast Attacks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-sword",
+      "name": "Sword",
+      "keywords": "Fast Attacks, Wide Sweeps, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-elven-spear",
+      "name": "Elven Spear",
+      "keywords": "Fast Attacks, Versatile, High Agility",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-elven-axe",
+      "name": "Elven Axe",
+      "keywords": "High Damage, Armour Piercing, Shield Breaking",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-dual-swords",
+      "name": "Dual Swords",
+      "keywords": "Fast Attacks, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-two-handed-sword",
+      "name": "Two-Handed Sword",
+      "keywords": "Fast Attacks, Wide Sweeps, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-moonfire-bow",
+      "name": "Moonfire Bow",
+      "keywords": "Armour Piercing, Sniper, Versatile",
+      "traits": "energy",
+      "properties": "ranged"
+    },
+    {
+      "id": "kerillian-hagbane-shortbow",
+      "name": "Hagbane Shortbow",
+      "keywords": "Damage Over Time, Rapid Fire, Crowd Control",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kerillian-briar-javelin",
+      "name": "Briar Javelin",
+      "keywords": "Armour Piercing, Sniper, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kerillian-swift-bow",
+      "name": "Swift Bow",
+      "keywords": "Rapid Fire, Crowd Control, Headshotting",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kerillian-longbow",
+      "name": "Longbow",
+      "keywords": "Armour Piercing, Sniper, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kerillian-spear-and-shield",
+      "name": "Spear and Shield",
+      "keywords": "Fast Attacks, Wide Sweeps, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "kerillian-volley-crossbow",
+      "name": "Volley Crossbow",
+      "keywords": "High Damage, Rapid Fire, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "kerillian-deepwood-staff",
+      "name": "Deepwood Staff",
+      "keywords": "Sniper, Crowd Control, Damage Over Time",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "saltzpyre-greatsword",
+      "name": "Greatsword",
+      "keywords": "High Damage, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-flail",
+      "name": "Flail",
+      "keywords": "Ignore Shields, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-axe",
+      "name": "Axe",
+      "keywords": "High Damage, Armour Piercing, Shield Breaking",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-bill-hook",
+      "name": "Bill Hook",
+      "keywords": "Wide Sweeps, Armour Piercing, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-falchion",
+      "name": "Falchion",
+      "keywords": "Headshotting, High Damage, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-axe-and-falchion",
+      "name": "Axe and Falchion",
+      "keywords": "High Damage, Fast Attacks, Armour Piercing",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-rapier",
+      "name": "Rapier",
+      "keywords": "Fast Attacks, Headshotting, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-crossbow",
+      "name": "Crossbow",
+      "keywords": "High Damage, Sniper, Piercing Bolts",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "saltzpyre-griffon-foot",
+      "name": "Griffon-foot",
+      "keywords": "High Damage, Rapid Fire, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "saltzpyre-volley-crossbow",
+      "name": "Volley Crossbow",
+      "keywords": "High Damage, Piercing Bolts, Rapid Fire",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "saltzpyre-repeater-pistol",
+      "name": "Repeater Pistol",
+      "keywords": "Rapid Fire, Close Range, High Damage",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "saltzpyre-brace-of-pistols",
+      "name": "Brace of Pistols",
+      "keywords": "High Damage, Rapid Fire, Versatile",
+      "traits": "ammo",
+      "properties": "ranged"
+    },
+    {
+      "id": "saltzpyre-skull-splitter-hammer",
+      "name": "Skull-Splitter Hammer",
+      "keywords": "Fast Attacks, Wide Sweeps, Weapon Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-holy-great-hammer",
+      "name": "Holy Great Hammer",
+      "keywords": "Wide Sweeps, Weapon Crowd Control, Armour Piercing",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-paired-skull-splitters",
+      "name": "Paired Skull-Splitters",
+      "keywords": "Weapon Crowd Control, Fast Attacks, Wide Sweeps",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-skull-splitter-shield",
+      "name": "Skull-Splitter & Shield",
+      "keywords": "Wide Sweeps, Weapon Crowd Control, Powerful Blocks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-skull-splitter-blessed-tome",
+      "name": "Skull-Splitter & Blessed Tome",
+      "keywords": "Fast Attacks, Wide Sweeps, Weapon Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "saltzpyre-flail-shield",
+      "name": "Flail & Shield",
+      "keywords": "Ignore Shields, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-crowbill",
+      "name": "Crowbill",
+      "keywords": "High Damage, Damage Over Time, Wide Sweeps",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-sword",
+      "name": "Sword",
+      "keywords": "Fast Attacks, Wide Sweeps, Versatile",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-mace",
+      "name": "Mace",
+      "keywords": "High Damage, Armour Piercing, Wide Sweeps",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-fire-sword",
+      "name": "Fire Sword",
+      "keywords": "Wide Sweeps, Crowd Control, Damage Over Time",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-flaming-flail",
+      "name": "Flaming Flail",
+      "keywords": "Ignore Shields, Wide Sweeps, Crowd Control",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-dagger",
+      "name": "Dagger",
+      "keywords": "Damage Over Time, Crowd Control, Fast Attacks",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-ensorcelled-reaper",
+      "name": "Ensorcelled Reaper",
+      "keywords": "Wide Sweeps, Crowd Control, Damage Over Time",
+      "traits": "melee",
+      "properties": "melee"
+    },
+    {
+      "id": "sienna-beam-staff",
+      "name": "Beam Staff",
+      "keywords": "Sniper, Crowd Control, Damage Over Time",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "sienna-flamestorm-staff",
+      "name": "Flamestorm Staff",
+      "keywords": "Damage Over Time, Charged Attack, Close Range",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "sienna-coruscation-staff",
+      "name": "Coruscation Staff",
+      "keywords": "Damage Over Time, Crowd Control, Charged Attack",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "sienna-fireball-staff",
+      "name": "Fireball Staff",
+      "keywords": "Crowd Control, Damage Over Time, Overheat",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "sienna-bolt-staff",
+      "name": "Bolt Staff",
+      "keywords": "Rapid Fire, Headshotting, Sniper",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "sienna-conflagration-staff",
+      "name": "Conflagration Staff",
+      "keywords": "Damage Over Time, Crowd Control, Charged Attack",
+      "traits": "heat",
+      "properties": "ranged"
+    },
+    {
+      "id": "sienna-soulstealer-staff",
+      "name": "Soulstealer Staff",
+      "keywords": "Sniper, Crowd Control, Damage Over Time",
+      "traits": "heat",
+      "properties": "ranged"
+    }
+  ],
+  "traits": {
+    "melee": [
+      {
+        "id": "heroic-intervention",
+        "name": "Heroic Intervention",
+        "description": "Assisting an ally under attack restores 15 temporary health for both players."
+      },
+      {
+        "id": "off-balance",
+        "name": "Off Balance",
+        "description": "Blocking an attack increases the damage the attacker takes by 20.0% for 5.0 seconds."
+      },
+      {
+        "id": "opportunist",
+        "name": "Opportunist",
+        "description": "Increases push strength by 50% when used against an attacking enemy."
+      },
+      {
+        "id": "parry",
+        "name": "Parry",
+        "description": "Timed blocks reduces stamina cost by 100.0%."
+      },
+      {
+        "id": "resourceful-combatant",
+        "name": "Resourceful Combatant",
+        "description": "Melee critical hits reduce the cooldown of your Career Skill by 5.0%. This effect can only trigger every 4 seconds."
+      },
+      {
+        "id": "swift-slaying",
+        "name": "Swift Slaying",
+        "description": "Critical hits increases attack speed by 20.0% for 5.0 seconds."
+      }
+    ],
+    "ammo": [
+      {
+        "id": "barrage",
+        "name": "Barrage",
+        "description": "Consecutive attacks against the same targets boosts attack power by 5.0% for 5.0 seconds."
+      },
+      {
+        "id": "conservative-shooter",
+        "name": "Conservative Shooter",
+        "description": "Headshots replenish 1.0 ammunition."
+      },
+      {
+        "id": "hunter",
+        "name": "Hunter",
+        "description": "Critical hits increases attack power by 25.0% against targets with the same armour class for a short time."
+      },
+      {
+        "id": "inspirational-shot",
+        "name": "Inspirational Shot",
+        "description": "Headshots restores stamina to nearby allies."
+      },
+      {
+        "id": "resourceful-sharpshooter",
+        "name": "Resourceful Sharpshooter",
+        "description": "Ranged critical hits reduce the cooldown of your Career Skill by 5.0%. This effect can only trigger every 4 seconds."
+      },
+      {
+        "id": "scrounger",
+        "name": "Scrounger",
+        "description": "Critical hits restore 5.0% of maximum ammunition. Can trigger once per attack."
+      }
+    ],
+    "heat": [
+      {
+        "id": "barrage",
+        "name": "Barrage",
+        "description": "Consecutive attacks against the same targets boosts attack power by 5.0% for 5.0 seconds."
+      },
+      {
+        "id": "heat-sink",
+        "name": "Heat Sink",
+        "description": "Critical hits refund the overcharge cost of the attack."
+      },
+      {
+        "id": "hunter",
+        "name": "Hunter",
+        "description": "Critical hits increases attack power by 25.0% against targets with the same armour class for a short time."
+      },
+      {
+        "id": "inspirational-shot",
+        "name": "Inspirational Shot",
+        "description": "Headshots restores stamina to nearby allies."
+      },
+      {
+        "id": "resourceful-sharpshooter",
+        "name": "Resourceful Sharpshooter",
+        "description": "Ranged critical hits reduce the cooldown of your Career Skill by 5.0%. This effect can only trigger every 4 seconds."
+      },
+      {
+        "id": "thermal-equalizer",
+        "name": "Thermal Equalizer",
+        "description": "Weapon generates 20.0% less overheat."
+      }
+    ],
+    "energy": [
+      {
+        "id": "barrage",
+        "name": "Barrage",
+        "description": "Consecutive attacks against the same targets boosts attack power by 5.0% for 5.0 seconds."
+      },
+      {
+        "id": "hunter",
+        "name": "Hunter",
+        "description": "Critical hits increases attack power by 25.0% against targets with the same armour class for a short time."
+      },
+      {
+        "id": "inspirational-shot",
+        "name": "Inspirational Shot",
+        "description": "Headshots restores stamina to nearby allies."
+      },
+      {
+        "id": "resourceful-sharpshooter",
+        "name": "Resourceful Sharpshooter",
+        "description": "Ranged critical hits reduce the cooldown of your Career Skill by 5.0%. This effect can only trigger every 4 seconds."
+      }
+    ],
+    "necklace": [
+      {
+        "id": "barkskin",
+        "name": "Barkskin",
+        "description": "Taking damage reduces the damage you take from subsequent sources by 40.0% for 2 seconds. This effect can only trigger every 2 seconds."
+      },
+      {
+        "id": "hand-of-shallya",
+        "name": "Hand of Shallya",
+        "description": "Healing yourself with a First Aid Kit or a Healing Draught also heals your nearby allies for 20.0% of their maximum health. Clears any wounds."
+      },
+      {
+        "id": "healers-touch",
+        "name": "Healers Touch",
+        "description": "25.0% chance to not consume healing item on use."
+      },
+      {
+        "id": "natural-bond",
+        "name": "Natural Bond",
+        "description": "Passively regenerates 1 health every 5 seconds. Healing from First Aid Kits and Healing Draughts are converted to temporary health."
+      },
+      {
+        "id": "boon-of-shallya",
+        "name": "Boon of Shallya",
+        "description": "Increases effectiveness of healing on you by 30.0%."
+      }
+    ],
+    "charm": [
+      {
+        "id": "concoction",
+        "name": "Concoction",
+        "description": "Drinking a potion grants the effect of all other potions. Duration reduced by 50.0%."
+      },
+      {
+        "id": "decanter",
+        "name": "Decanter",
+        "description": "Increases the duration of potions by 50.0%."
+      },
+      {
+        "id": "home-brewer",
+        "name": "Home Brewer",
+        "description": "25.0% chance to not consume potion on use."
+      },
+      {
+        "id": "proxy",
+        "name": "Proxy",
+        "description": "Consuming a potion spreads the effect to the nearest ally."
+      }
+    ],
+    "trinket": [
+      {
+        "id": "explosive-ordnance",
+        "name": "Explosive Ordnance",
+        "description": "Increases grenade explosion radius by 50.0%."
+      },
+      {
+        "id": "grenadier",
+        "name": "Grenadier",
+        "description": "25.0% chance to not consume grenade on use."
+      },
+      {
+        "id": "shrapnel",
+        "name": "Shrapnel",
+        "description": "Grenades cause hit enemies to take 20.0% increased damage for 10.0 seconds."
+      }
+    ]
+  },
+  "properties": {
+    "melee": [
+      {
+        "id": "attack-speed",
+        "name": "Attack Speed",
+        "line": "+ 5.0% Attack Speed"
+      },
+      {
+        "id": "stamina",
+        "name": "Stamina",
+        "line": "+ 2.0 Stamina"
+      },
+      {
+        "id": "block-cost-reduction",
+        "name": "Block Cost Reduction",
+        "line": "+ 30.0% Block Cost Reduction"
+      },
+      {
+        "id": "crit-chance",
+        "name": "Crit Chance",
+        "line": "+ 5.0% Crit Chance"
+      },
+      {
+        "id": "crit-power",
+        "name": "Crit Power",
+        "line": "+ 20.0% Crit Power"
+      },
+      {
+        "id": "push-block-angle",
+        "name": "Push/Block Angle",
+        "line": "+ 30.0% Push/Block Angle"
+      },
+      {
+        "id": "power-vs-skaven",
+        "name": "Power vs Skaven",
+        "line": "+ 10.0% Power vs Skaven"
+      },
+      {
+        "id": "power-vs-chaos",
+        "name": "Power vs Chaos",
+        "line": "+ 10.0% Power vs Chaos"
+      }
+    ],
+    "ranged": [
+      {
+        "id": "crit-chance",
+        "name": "Crit Chance",
+        "line": "+ 5.0% Crit Chance"
+      },
+      {
+        "id": "crit-power",
+        "name": "Crit Power",
+        "line": "+ 20.0% Crit Power"
+      },
+      {
+        "id": "power-vs-skaven",
+        "name": "Power vs Skaven",
+        "line": "+ 10.0% Power vs Skaven"
+      },
+      {
+        "id": "power-vs-chaos",
+        "name": "Power vs Chaos",
+        "line": "+ 10.0% Power vs Chaos"
+      },
+      {
+        "id": "power-vs-infantry",
+        "name": "Power vs Infantry",
+        "line": "+ 10.0% Power vs Infantry"
+      },
+      {
+        "id": "power-vs-armored",
+        "name": "Power vs Armored",
+        "line": "+ 10.0% Power vs Armored"
+      },
+      {
+        "id": "power-vs-berserkers",
+        "name": "Power vs Berserkers",
+        "line": "+ 10.0% Power vs Berserkers"
+      },
+      {
+        "id": "power-vs-monsters",
+        "name": "Power vs Monsters",
+        "line": "+ 10.0% Power vs Monsters"
+      }
+    ],
+    "necklace": [
+      {
+        "id": "stamina",
+        "name": "Stamina",
+        "line": "+ 2.0 Stamina"
+      },
+      {
+        "id": "block-cost-reduction",
+        "name": "Block Cost Reduction",
+        "line": "+ 30.0% Block Cost Reduction"
+      },
+      {
+        "id": "health",
+        "name": "Health",
+        "line": "+ 20.0% Health"
+      },
+      {
+        "id": "push-block-angle",
+        "name": "Push/Block Angle",
+        "line": "+ 30.0% Push/Block Angle"
+      },
+      {
+        "id": "damage-reduction-vs-skaven",
+        "name": "Damage reduction vs Skaven",
+        "line": "+ 10.0% Damage Reduction vs Skaven"
+      },
+      {
+        "id": "damage-reduction-vs-chaos",
+        "name": "Damage reduction vs Chaos",
+        "line": "+ 10.0% Damage Reduction vs Chaos"
+      },
+      {
+        "id": "damage-reduction-vs-area",
+        "name": "Damage reduction vs Area",
+        "line": "+ 10.0% Damage Reduction vs Area"
+      }
+    ],
+    "charm": [
+      {
+        "id": "attack-speed",
+        "name": "Attack Speed",
+        "line": "+ 5.0% Attack Speed"
+      },
+      {
+        "id": "crit-power",
+        "name": "Crit Power",
+        "line": "+ 20.0% Crit Power"
+      },
+      {
+        "id": "power-vs-skaven",
+        "name": "Power vs Skaven",
+        "line": "+ 10.0% Power vs Skaven"
+      },
+      {
+        "id": "power-vs-chaos",
+        "name": "Power vs Chaos",
+        "line": "+ 10.0% Power vs Chaos"
+      },
+      {
+        "id": "power-vs-infantry",
+        "name": "Power vs Infantry",
+        "line": "+ 10.0% Power vs Infantry"
+      },
+      {
+        "id": "power-vs-armored",
+        "name": "Power vs Armored",
+        "line": "+ 10.0% Power vs Armored"
+      },
+      {
+        "id": "power-vs-berserkers",
+        "name": "Power vs Berserkers",
+        "line": "+ 10.0% Power vs Berserkers"
+      },
+      {
+        "id": "power-vs-monsters",
+        "name": "Power vs Monsters",
+        "line": "+ 10.0% Power vs Monsters"
+      }
+    ],
+    "trinket": [
+      {
+        "id": "cooldown-reduction",
+        "name": "Cooldown Reduction",
+        "line": "+ 10.0% Cooldown Reduction"
+      },
+      {
+        "id": "crit-chance",
+        "name": "Crit Chance",
+        "line": "+ 5.0% Crit Chance"
+      },
+      {
+        "id": "curse-resistance",
+        "name": "Curse Resistance",
+        "line": "+ 33.0% Curse Resistance"
+      },
+      {
+        "id": "movement-speed",
+        "name": "Movement Speed",
+        "line": "+ 5.0% Movement Speed"
+      },
+      {
+        "id": "respawn-speed",
+        "name": "Respawn Speed",
+        "line": "+ 30.0% Respawn Speed"
+      },
+      {
+        "id": "revive-speed",
+        "name": "Revive Speed",
+        "line": "+ 30.0% Revive Speed"
+      },
+      {
+        "id": "stamina-recovery-rate",
+        "name": "Stamina Recovery Rate",
+        "line": "+ 30.0% Stamina Recovery Rate"
+      }
+    ]
+  }
+}

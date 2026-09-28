@@ -14,6 +14,11 @@ Windows tray app that holds a tag key in Vermintide 2 while that game is focused
 - `Settings/TagSettings.cs` — locked snapshot and setters. `TagSnapshot` is the read model.
 - `Settings/TagConfigStore.cs` — JSON load/save.
 - `Settings/TagKeyHelper.cs` — normalize keys, `"Key Down"` / `"Key Up"` strokes, which key to capture.
+- `Catalog/catalog.json` — heroes, careers, weapons, red properties, traits, and talent text. Embedded in the executable.
+- `Catalog/GameCatalog.cs` — reads that catalog.
+- `Notes/LoadoutBook.cs` — many named loadouts per career. Mutations save immediately.
+- `Notes/LoadoutStore.cs` — JSON load/save for notes.
+- `Overlays/NotesOverlayForm.cs` — F6 loadout board.
 - `Overlays/OverlayForm.cs` — borderless topmost no-activate base. `NoFocusButton` lives here.
 - `Overlays/StatusOverlayForm.cs` — `Off  {key}` / `On  {key}` chip. Hit-testing is transparent.
 - `Overlays/SettingsOverlayForm.cs` — editor. Drag raises `DragStart`.
@@ -24,20 +29,23 @@ Windows tray app that holds a tag key in Vermintide 2 while that game is focused
 Target process is `vermintide2_dx12.exe`. Hotkeys run only when that window is active.
 
 - Activate starts the tag loop: key down, wait `keyGapMs`, key up, wait `tagDelayMs`, repeat. Deactivate clears the flag. A held key is released on stop or cancel.
-- Edit is fixed `F5` and toggles the settings overlay. It cannot be assigned as a tag or hotkey.
-- Hotkey ids are `"activate"`, `"deactivate"`, `"edit"`. Changing activate/deactivate calls `hotkeys.Change`.
-- The timer tracks the game rect. Both overlays hide unless the game is foreground or this process is. Bounds under 50 px, or left/top below -1000, are ignored. While dragging, the timer is 16 ms; on release it saves the status offset and returns to 100 ms.
+- Edit is fixed `F5` and toggles the settings overlay. Notes is fixed `F6` and toggles the loadout board. Neither can be assigned as a tag or hotkey.
+- Hotkey ids are `"activate"`, `"deactivate"`, `"edit"`, `"notes"`. Changing activate/deactivate calls `hotkeys.Change`.
+- The timer tracks the game rect. Overlays hide unless the game is foreground or this process is. Bounds under 50 px, or left/top below -1000, are ignored. While dragging, the timer is 16 ms; on release it saves the status offset and returns to 100 ms.
+- F6 opens the loadout board inside the game window. It fills that window inside the 12 px margin and scrolls. Showing it does not take focus. A click does, so the play note can be typed. Each career has many named loadouts: primary, secondary, necklace, charm, trinket, six talent rows, and a play note. Weapon lists are the career allow-list. Properties and traits are the red values. Hover a talent or trait for the full description. `Show descriptions` prints talent text on the grid. F6 again, or Close, hides the board.
 - Status text shows the key that does the next action: activate key when off, deactivate key when on.
 
 ## Config
 
 `%LocalAppData%\Vermin Kit\config.json`, camelCase, indented. If missing, migrate from `%LocalAppData%\Vermintide 2\config.json` and rewrite the new path. Fields: `key`, `tagDelayMs`, `keyGapMs`, `x`, `y`, `activateKey`, `deactivateKey`, `anchor`.
 
+`%LocalAppData%\Vermin Kit\notes.json`, camelCase, indented. Fields: `careerId`, `selected` (career id to loadout id), `loadouts`. Each loadout has `id`, `careerId`, `name`, `notes`, gear slots, and `talents` (six nullable column indexes). Writes use `notes.json.tmp` then move. IO and JSON errors are swallowed. Unknown careers, weapons, traits, and properties are dropped on load.
+
 Defaults: tag key `XButton1`, tag delay 300, key gap 10, activate `F1`, deactivate `F2`, no offset. No offset means top-center, or a legacy `anchor` (`TopLeft` … `BottomRight`) until the user drags. Delays clamp to 10–60000. Activate and deactivate cannot match. Writes use `config.json.tmp` then move. IO and JSON errors are swallowed.
 
 ## Do not break
 
-- Overlays must not take focus: `WS_EX_NOACTIVATE`, `ShowWithoutActivation`, `WM_MOUSEACTIVATE` → `MA_NOACTIVATE`. Status `WM_NCHITTEST` returns `HTTRANSPARENT`.
+- The status chip and the settings panel must not take focus: `WS_EX_NOACTIVATE`, `ShowWithoutActivation`, `WM_MOUSEACTIVATE` → `MA_NOACTIVATE`. Status `WM_NCHITTEST` returns `HTTRANSPARENT`. The notes board uses `ShowWithoutActivation` so F6 does not steal focus, and it accepts a click so the play note can be typed.
 - Settings mutations go through `TagSettings` and save immediately. Read state with `Snapshot()`.
 - Placement stays inside the game window with a 12 px margin (`OverlayPlacement.Margin`). Editor sits 8 px under the chip, or above if it would not fit.
 - Key capture waits for keys already down to release, then picks the first non-modifier (`TagKeyHelper.Pick`). Timeout is 5 seconds.

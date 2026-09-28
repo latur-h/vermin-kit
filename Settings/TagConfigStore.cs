@@ -116,7 +116,7 @@ static class TagConfigStore
 
     static string NormalizeHotkey(string? input, string fallback)
     {
-        if (!TagKeyHelper.TryNormalize(input, out var key) || TagSettings.IsEditKey(key))
+        if (!TagKeyHelper.TryNormalize(input, out var key) || TagSettings.IsReservedKey(key))
             return fallback;
         return key;
     }

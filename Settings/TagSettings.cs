@@ -5,6 +5,7 @@ sealed class TagSettings
     public const int MinDelayMs = 10;
     public const int MaxDelayMs = 60_000;
     public const string EditKey = "F5";
+    public const string NotesKey = "F6";
     public const string DefaultActivateKey = "F1";
     public const string DefaultDeactivateKey = "F2";
 
@@ -54,7 +55,7 @@ sealed class TagSettings
         if (!TagKeyHelper.TryNormalize(input, out var normalized))
             return false;
 
-        if (IsEditKey(normalized))
+        if (IsReservedKey(normalized))
             return false;
 
         lock (gate)
@@ -69,7 +70,7 @@ sealed class TagSettings
 
     bool TrySetHotkey(string? input, bool activate)
     {
-        if (!TagKeyHelper.TryNormalize(input, out var normalized) || IsEditKey(normalized))
+        if (!TagKeyHelper.TryNormalize(input, out var normalized) || IsReservedKey(normalized))
             return false;
 
         lock (gate)
@@ -88,8 +89,9 @@ sealed class TagSettings
         return true;
     }
 
-    public static bool IsEditKey(string key) =>
-        key.Equals(EditKey, StringComparison.OrdinalIgnoreCase);
+    public static bool IsReservedKey(string key) =>
+        key.Equals(EditKey, StringComparison.OrdinalIgnoreCase)
+        || key.Equals(NotesKey, StringComparison.OrdinalIgnoreCase);
 
     public void SetTagDelayMs(int milliseconds)
     {

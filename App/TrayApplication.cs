@@ -15,12 +15,14 @@ sealed class TrayApplication : ApplicationContext
     readonly GlobalHotKeyManager hotkeys = new(new GlobalHotKeyManagerOptions { RunMessageLoop = true });
     readonly StatusOverlayForm statusForm = new();
     readonly SettingsOverlayForm settingsForm;
+    readonly NotesOverlayForm notesForm;
     readonly NotifyIcon notifyIcon;
     readonly Icon trayIcon;
     readonly System.Windows.Forms.Timer placementTimer;
 
     volatile bool tagging;
     volatile bool settingsOpen;
+    volatile bool notesOpen;
     bool stopped;
     WindowBounds? lastBounds;
     Point statusPointShown;
@@ -29,6 +31,9 @@ sealed class TrayApplication : ApplicationContext
     Point settingsPointShown;
     Size settingsSizeShown;
     bool settingsVisible;
+    Point notesPointShown;
+    Size notesSizeShown;
+    bool notesVisible;
     bool shownTagging;
     TagSnapshot shownSnapshot;
     bool dragging;
@@ -39,6 +44,8 @@ sealed class TrayApplication : ApplicationContext
     {
         settingsForm = new SettingsOverlayForm(settings, inputSimulator);
         settingsForm.DragStart += BeginDrag;
+        notesForm = new NotesOverlayForm(new LoadoutBook(GameCatalog.Load()));
+        notesForm.CloseRequested += CloseNotes;
         trayIcon = CreateTrayIcon();
         notifyIcon = new NotifyIcon
         {
@@ -60,6 +67,7 @@ sealed class TrayApplication : ApplicationContext
             hotkeys.Register("activate", Activate, initial.ActivateKey);
             hotkeys.Register("deactivate", Deactivate, initial.DeactivateKey);
             hotkeys.Register("edit", ToggleEdit, TagSettings.EditKey);
+            hotkeys.Register("notes", ToggleNotes, TagSettings.NotesKey);
             shownSnapshot = initial;
             statusForm.ShowStatus(false, initial.ActivateKey);
         }
@@ -120,6 +128,28 @@ sealed class TrayApplication : ApplicationContext
 
         settingsOpen = !settingsOpen;
         return Task.CompletedTask;
+    }
+
+    Task ToggleNotes()
+    {
+        if (inputSimulator.IsActiveWindow())
+        {
+            notesOpen = !notesOpen;
+            if (!notesOpen)
+                inputSimulator.WinActivate(ProcessName);
+            return Task.CompletedTask;
+        }
+
+        if (notesOpen && IsThisProcessForeground())
+            CloseNotes();
+        return Task.CompletedTask;
+    }
+
+    void CloseNotes()
+    {
+        notesOpen = false;
+        if (IsThisProcessForeground())
+            inputSimulator.WinActivate(ProcessName);
     }
 
     async Task TagLoop()
@@ -212,15 +242,34 @@ sealed class TrayApplication : ApplicationContext
                 settingsForm.Conceal();
                 settingsVisible = false;
             }
+        }
+        else
+        {
+            if (!settingsVisible)
+                settingsForm.Sync();
+
+            var settingsSize = settingsForm.ClientSize;
+            var settingsPoint = OverlayPlacement.PlaceEditor(bounds, statusPoint, statusSize, settingsSize);
+            Place(settingsForm, settingsPoint, settingsSize, ref settingsPointShown, ref settingsSizeShown, ref settingsVisible);
+        }
+
+        if (!notesOpen)
+        {
+            if (notesVisible)
+            {
+                notesForm.Conceal();
+                notesVisible = false;
+            }
             return;
         }
 
-        if (!settingsVisible)
-            settingsForm.Sync();
+        var notesSize = new Size(
+            Math.Max(1, bounds.Width - OverlayPlacement.Margin * 2),
+            Math.Max(1, bounds.Height - OverlayPlacement.Margin * 2));
+        var notesPoint = new Point(bounds.Left + OverlayPlacement.Margin, bounds.Top + OverlayPlacement.Margin);
+        Place(notesForm, notesPoint, notesSize, ref notesPointShown, ref notesSizeShown, ref notesVisible);
+        return;
 
-        var settingsSize = settingsForm.ClientSize;
-        var settingsPoint = OverlayPlacement.PlaceEditor(bounds, statusPoint, statusSize, settingsSize);
-        Place(settingsForm, settingsPoint, settingsSize, ref settingsPointShown, ref settingsSizeShown, ref settingsVisible);
     }
 
     void BeginDrag(Point cursor)
@@ -273,6 +322,12 @@ sealed class TrayApplication : ApplicationContext
             settingsForm.Conceal();
             settingsVisible = false;
         }
+
+        if (notesVisible)
+        {
+            notesForm.Conceal();
+            notesVisible = false;
+        }
     }
 
     static void Place(OverlayForm form, Point point, Size size, ref Point shownPoint, ref Size shownSize, ref bool visible)
@@ -317,6 +372,7 @@ sealed class TrayApplication : ApplicationContext
         placementTimer.Dispose();
         statusForm.CloseForExit();
         settingsForm.CloseForExit();
+        notesForm.CloseForExit();
         notifyIcon.Visible = false;
         notifyIcon.Dispose();
         trayIcon.Dispose();

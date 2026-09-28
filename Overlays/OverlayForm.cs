@@ -19,6 +19,8 @@ class OverlayForm : Form
 
     bool allowClose;
 
+    protected virtual bool AllowsActivation => false;
+
     protected OverlayForm()
     {
         FormBorderStyle = FormBorderStyle.None;
@@ -40,14 +42,16 @@ class OverlayForm : Form
         get
         {
             var parameters = base.CreateParams;
-            parameters.ExStyle |= WS_EX_NOACTIVATE | WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
+            parameters.ExStyle |= WS_EX_TOOLWINDOW | WS_EX_TOPMOST;
+            if (!AllowsActivation)
+                parameters.ExStyle |= WS_EX_NOACTIVATE;
             return parameters;
         }
     }
 
     protected override void WndProc(ref Message m)
     {
-        if (m.Msg == WM_MOUSEACTIVATE)
+        if (!AllowsActivation && m.Msg == WM_MOUSEACTIVATE)
         {
             m.Result = (IntPtr)MA_NOACTIVATE;
             return;
