@@ -260,6 +260,9 @@ sealed class NotesEditor : UserControl
         painting = true;
         box.Text = plain.ToString();
         painting = false;
+        styledText = "";
+        styledSpans = [];
+        styledBold = [];
         ApplyLevels(levels);
         Colorize();
         SyncBar();
