@@ -963,7 +963,7 @@ sealed class NotesOverlayForm : OverlayForm
         var notesX = x + Math.Max(0, (inner - notesWidth) / 2);
         notesCaption.SetBounds(notesX, y, notesWidth, 22);
         y += 24;
-        var notesHeight = Math.Max(360, viewHeight * 28 / 100);
+        var notesHeight = Math.Max(KitLook.NotesMinHeight, viewHeight * 28 / 100);
         notesEditor.SetBounds(notesX, y, notesWidth, notesHeight);
         return notesEditor.Bottom + pad;
     }

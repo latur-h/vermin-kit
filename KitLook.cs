@@ -14,6 +14,8 @@ static class KitLook
     public static Font CardPower { get; } = new("Georgia", 20f, FontStyle.Bold, GraphicsUnit.Point);
     public static Font Level { get; } = new("Georgia", 11f, FontStyle.Bold, GraphicsUnit.Point);
 
+    public static int NotesMinHeight { get; } = 720;
+
     public static Color Ink { get; } = Color.FromArgb(236, 226, 210);
     public static Color Hint { get; } = Color.FromArgb(186, 170, 148);
     public static Color Paper { get; } = Color.FromArgb(28, 18, 12);
