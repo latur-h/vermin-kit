@@ -89,6 +89,7 @@ sealed class NotesEditor : UserControl
                 ClearRect();
         };
         box.MouseMove += (_, args) => Hit(args.Location);
+        box.HandleCreated += (_, _) => RestoreIndents();
         box.MouseLeave += (_, _) => ClearHover();
         box.MouseWheel += (_, args) => OnWheel(args);
         box.KeyDown += (_, args) => OnBoxKey(args);
@@ -124,9 +125,20 @@ sealed class NotesEditor : UserControl
     protected override void OnHandleCreated(EventArgs e)
     {
         base.OnHandleCreated(e);
-        if (pendingLevels is not null)
-            ApplyLevels(pendingLevels);
+        painting = true;
+        try
+        {
+            if (!box.IsHandleCreated)
+                _ = box.Handle;
+        }
+        finally
+        {
+            painting = false;
+        }
+
+        RestoreIndents();
         Colorize();
+        RestoreIndents();
         SyncBar();
     }
 
@@ -166,7 +178,9 @@ sealed class NotesEditor : UserControl
     public string Export()
     {
         var text = Notes;
-        if (paragraphLevels.Length != ParagraphCount(text))
+        if (pendingLevels is not null)
+            paragraphLevels = pendingLevels.ToArray();
+        else if (paragraphLevels.Length != ParagraphCount(text))
             paragraphLevels = ReadLevels();
 
         var result = new StringBuilder();
@@ -934,6 +948,14 @@ sealed class NotesEditor : UserControl
         }
 
         NotesChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    void RestoreIndents()
+    {
+        if (pendingLevels is not null)
+            ApplyLevels(pendingLevels);
+        else if (paragraphLevels.Length > 0)
+            ApplyLevels(paragraphLevels.ToList());
     }
 
     void ApplyLevels(List<int> levels)

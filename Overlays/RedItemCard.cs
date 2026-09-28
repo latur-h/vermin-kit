@@ -36,6 +36,9 @@ sealed class RedItemCard : Control
     string resource = "";
     Image? mark;
     Image? traitIcon;
+    string copyMarkup = "";
+    Rectangle copyHit;
+    bool copyHot;
     int hover = -1;
 
     public RedItemCard(string slot, string slotTitle, bool hasWeapon)
@@ -100,25 +103,34 @@ sealed class RedItemCard : Control
         Invalidate();
     }
 
+    public void ShowCopy(string markup)
+    {
+        copyMarkup = markup ?? "";
+        Invalidate();
+    }
+
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
         if (Quiet)
             return;
-        var next = HitAt(e.Location);
-        if (next == hover)
+        var onCopy = !copyHit.IsEmpty && copyHit.Contains(e.Location);
+        var next = onCopy ? -1 : HitAt(e.Location);
+        if (onCopy == copyHot && next == hover)
             return;
+        copyHot = onCopy;
         hover = next;
-        Cursor = next >= 0 ? Cursors.Hand : Cursors.Default;
+        Cursor = onCopy || next >= 0 ? Cursors.Hand : Cursors.Default;
         Invalidate();
     }
 
     protected override void OnMouseLeave(EventArgs e)
     {
         base.OnMouseLeave(e);
-        if (hover < 0)
+        if (hover < 0 && !copyHot)
             return;
         hover = -1;
+        copyHot = false;
         Cursor = Cursors.Default;
         Invalidate();
     }
@@ -128,6 +140,12 @@ sealed class RedItemCard : Control
         base.OnMouseClick(e);
         if (Quiet || !itemEnabled || e.Button != MouseButtons.Left)
             return;
+
+        if (!copyHit.IsEmpty && copyHit.Contains(e.Location))
+        {
+            CopyMarkup();
+            return;
+        }
 
         var index = HitAt(e.Location);
         if (index < 0)
@@ -149,8 +167,13 @@ sealed class RedItemCard : Control
             graphics.FillRectangle(shade, bounds);
 
         const int pad = 8;
+        var copySize = Quiet || copyMarkup.Length == 0 ? 0 : 22;
+        copyHit = copySize == 0
+            ? Rectangle.Empty
+            : new Rectangle(Width - pad - copySize, 8, copySize, copySize);
         var markSize = mark is null ? 0 : 36;
-        var textWidth = Math.Max(40, Width - pad * 2 - (markSize == 0 ? 0 : markSize + 6));
+        var reserved = (markSize == 0 ? 0 : markSize + 6) + (copySize == 0 ? 0 : copySize + 6);
+        var textWidth = Math.Max(40, Width - pad * 2 - reserved);
         var y = 6;
         hits[0] = HasWeapon ? new Rectangle(pad, y, textWidth, 22) : Rectangle.Empty;
         var subtitleRect = new Rectangle(pad, y + 22, textWidth, 16);
@@ -186,7 +209,13 @@ sealed class RedItemCard : Control
 
         DrawLine(graphics, title, titleFont, TitleColor, hits[0].IsEmpty ? new Rectangle(pad, 6, textWidth, 22) : hits[0]);
         if (mark is not null)
-            graphics.DrawImage(mark, Width - pad - markSize, 6, markSize, markSize);
+        {
+            var markLeft = copySize == 0 ? Width - pad - markSize : copyHit.X - 6 - markSize;
+            graphics.DrawImage(mark, markLeft, 6, markSize, markSize);
+        }
+
+        if (copySize > 0)
+            DrawCopy(graphics, copyHit, copyHot);
         DrawLine(graphics, SlotTitle, Font, SubtitleColor, subtitleRect);
         if (showPower)
         {
@@ -241,6 +270,36 @@ sealed class RedItemCard : Control
 
         using (var border = new Pen(BorderColor, 2f))
             graphics.DrawRectangle(border, 1, 1, Math.Max(1, Width - 3), Math.Max(1, Height - 3));
+    }
+
+    void CopyMarkup()
+    {
+        if (copyMarkup.Length == 0)
+            return;
+
+        try
+        {
+            Clipboard.SetText(copyMarkup);
+        }
+        catch (System.Runtime.InteropServices.ExternalException)
+        {
+        }
+    }
+
+    static void DrawCopy(Graphics graphics, Rectangle bounds, bool hot)
+    {
+        graphics.SmoothingMode = SmoothingMode.AntiAlias;
+        using var fill = new SolidBrush(hot ? HoverColor : Color.FromArgb(210, 28, 18, 12));
+        using var pen = new Pen(hot ? KitLook.ButtonChosenBorder : KitLook.Frame, 1.5f);
+        graphics.FillRectangle(fill, bounds);
+        graphics.DrawRectangle(pen, bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
+        var page = new Rectangle(bounds.X + 5, bounds.Y + 6, 8, 10);
+        var back = new Rectangle(page.X + 4, page.Y - 3, 8, 10);
+        using var pageFill = new SolidBrush(KitLook.Ink);
+        graphics.FillRectangle(pageFill, back);
+        graphics.DrawRectangle(pen, back);
+        graphics.FillRectangle(pageFill, page);
+        graphics.DrawRectangle(pen, page);
     }
 
     int HitAt(Point point)

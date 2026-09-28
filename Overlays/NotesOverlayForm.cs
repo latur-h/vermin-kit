@@ -373,8 +373,11 @@ sealed class NotesOverlayForm : OverlayForm
             var weapon = book.Catalog.FindWeapon(gear?.WeaponId);
             var trait = book.Catalog.FindTrait(book.TraitGroup(card.Slot), gear?.TraitId);
             var pool = book.PropertyPool(card.Slot);
-            var lineA = book.Catalog.FindProperty(pool, gear?.PropertyA)?.Line ?? "Choose property";
-            var lineB = book.Catalog.FindProperty(pool, gear?.PropertyB)?.Line ?? "Choose property";
+            var propertyA = book.Catalog.FindProperty(pool, gear?.PropertyA);
+            var propertyB = book.Catalog.FindProperty(pool, gear?.PropertyB);
+            var lineA = propertyA?.Line ?? "Choose property";
+            var lineB = propertyB?.Line ?? "Choose property";
+            card.ShowCopy(card.HasWeapon && weapon is not null ? NoteToken(weapon, propertyA, propertyB, trait) : "");
             card.ShowItem(
                 enabled,
                 card.HasWeapon ? weapon?.Name ?? "Choose weapon" : card.SlotTitle,
@@ -1117,16 +1120,37 @@ sealed class NotesOverlayForm : OverlayForm
             return;
         }
 
-        var scale = Math.Max(destination.Width / (float)backdrop.Width, destination.Height / (float)backdrop.Height);
+        var view = board.ViewSize;
+        var frameWidth = view.Width > 1 ? view.Width : destination.Width;
+        var frameHeight = view.Height > 1 ? view.Height : Math.Max(1, frameWidth * 9 / 16);
+        var scale = Math.Max(frameWidth / (float)backdrop.Width, frameHeight / (float)backdrop.Height);
         var width = backdrop.Width * scale;
         var height = backdrop.Height * scale;
         graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
         graphics.DrawImage(
             backdrop,
             destination.X + (destination.Width - width) / 2f,
-            destination.Y + (destination.Height - height) / 2f,
+            destination.Y,
             width,
             height);
+    }
+
+    static string NoteToken(WeaponInfo weapon, PropertyInfo? first, PropertyInfo? second, TraitInfo? trait)
+    {
+        var text = weapon.Name;
+        var properties = new List<string>(2);
+        if (first is not null)
+            properties.Add(first.Name);
+        if (second is not null)
+            properties.Add(second.Name);
+        if (properties.Count > 0 || trait is not null)
+        {
+            text += ": " + string.Join(", ", properties);
+            if (trait is not null)
+                text += "; " + trait.Name;
+        }
+
+        return "[" + text + "]";
     }
 
     sealed record PickChoice(string Id, string Label, string? Detail)
