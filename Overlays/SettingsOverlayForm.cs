@@ -4,8 +4,8 @@ namespace VerminKit;
 
 sealed class SettingsOverlayForm : OverlayForm
 {
-    static readonly Color HintColor = Color.FromArgb(180, 180, 180);
-    static readonly Color ErrorColor = Color.FromArgb(255, 150, 130);
+    static readonly Color HintColor = KitLook.SettingsHint;
+    static readonly Color ErrorColor = KitLook.SettingsError;
 
     readonly TagSettings settings;
     readonly InputSimulator simulator;

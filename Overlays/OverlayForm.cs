@@ -30,9 +30,9 @@ class OverlayForm : Form
         TopMost = true;
         ControlBox = false;
         AutoScaleMode = AutoScaleMode.None;
-        BackColor = Color.FromArgb(28, 28, 28);
-        ForeColor = Color.FromArgb(235, 235, 235);
-        Font = new Font("Segoe UI", 9f, FontStyle.Regular, GraphicsUnit.Point);
+        BackColor = KitLook.Chrome;
+        ForeColor = KitLook.ChromeText;
+        Font = KitLook.Overlay;
     }
 
     protected override bool ShowWithoutActivation => true;

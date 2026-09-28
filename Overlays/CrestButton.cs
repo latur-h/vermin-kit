@@ -5,13 +5,13 @@ namespace VerminKit;
 
 sealed class CrestButton : BoardButton
 {
-    static readonly Color IdleFill = Color.FromArgb(32, 22, 16);
-    static readonly Color HotFill = Color.FromArgb(58, 38, 22);
-    static readonly Color ChosenFill = Color.FromArgb(92, 48, 18);
-    static readonly Color IdleBorder = Color.FromArgb(128, 92, 48);
-    static readonly Color ChosenBorder = Color.FromArgb(214, 154, 58);
-    static readonly Color TextColor = Color.FromArgb(236, 226, 210);
-    static readonly Color DimColor = Color.FromArgb(120, 110, 100);
+    static readonly Color IdleFill = KitLook.ButtonIdle;
+    static readonly Color HotFill = KitLook.ButtonHot;
+    static readonly Color ChosenFill = KitLook.ButtonChosen;
+    static readonly Color IdleBorder = KitLook.ButtonBorder;
+    static readonly Color ChosenBorder = KitLook.ButtonChosenBorder;
+    static readonly Color TextColor = KitLook.Ink;
+    static readonly Color DimColor = KitLook.ButtonDim;
 
     bool chosen;
     bool menu;

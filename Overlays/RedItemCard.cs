@@ -5,20 +5,20 @@ namespace VerminKit;
 
 sealed class RedItemCard : Control
 {
-    static readonly Color TitleColor = Color.FromArgb(196, 48, 40);
-    static readonly Color SubtitleColor = Color.FromArgb(236, 232, 226);
-    static readonly Color PowerColor = Color.FromArgb(245, 242, 236);
-    static readonly Color LabelColor = Color.FromArgb(168, 160, 150);
-    static readonly Color PropertyColor = Color.FromArgb(176, 198, 232);
-    static readonly Color PlaceholderColor = Color.FromArgb(128, 116, 104);
-    static readonly Color TraitColor = Color.FromArgb(214, 122, 48);
-    static readonly Color BodyColor = Color.FromArgb(214, 208, 198);
-    static readonly Color KeywordColor = Color.FromArgb(96, 176, 72);
-    static readonly Color BorderColor = Color.FromArgb(118, 74, 38);
-    static readonly Color HoverColor = Color.FromArgb(48, 255, 220, 170);
+    static readonly Color TitleColor = KitLook.CardTitleColor;
+    static readonly Color SubtitleColor = KitLook.CardSubtitle;
+    static readonly Color PowerColor = KitLook.CardPowerColor;
+    static readonly Color LabelColor = KitLook.CardLabel;
+    static readonly Color PropertyColor = KitLook.CardProperty;
+    static readonly Color PlaceholderColor = KitLook.CardPlaceholder;
+    static readonly Color TraitColor = KitLook.CardTrait;
+    static readonly Color BodyColor = KitLook.CardBody;
+    static readonly Color KeywordColor = KitLook.CardKeyword;
+    static readonly Color BorderColor = KitLook.CardBorder;
+    static readonly Color HoverColor = KitLook.CardHover;
 
-    readonly Font titleFont = new("Georgia", 12f, FontStyle.Bold, GraphicsUnit.Point);
-    readonly Font powerFont = new("Georgia", 20f, FontStyle.Bold, GraphicsUnit.Point);
+    readonly Font titleFont = KitLook.CardTitle;
+    readonly Font powerFont = KitLook.CardPower;
     readonly string[] fields = ["weapon", "property-a", "property-b", "trait"];
     readonly Rectangle[] hits = new Rectangle[4];
 
@@ -49,7 +49,7 @@ sealed class RedItemCard : Control
             ControlStyles.ResizeRedraw |
             ControlStyles.UserPaint,
             true);
-        BackColor = Color.FromArgb(22, 14, 10);
+        BackColor = KitLook.Field;
     }
 
     public static Image? Backdrop { get; set; }
@@ -100,17 +100,6 @@ sealed class RedItemCard : Control
         Invalidate();
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            titleFont.Dispose();
-            powerFont.Dispose();
-        }
-
-        base.Dispose(disposing);
-    }
-
     protected override void OnMouseMove(MouseEventArgs e)
     {
         base.OnMouseMove(e);
@@ -156,7 +145,7 @@ sealed class RedItemCard : Control
         else
             graphics.Clear(BackColor);
 
-        using (var shade = new SolidBrush(Color.FromArgb(168, 12, 6, 4)))
+        using (var shade = new SolidBrush(KitLook.CardShade))
             graphics.FillRectangle(shade, bounds);
 
         const int pad = 8;
@@ -236,7 +225,7 @@ sealed class RedItemCard : Control
                 Font,
                 new Rectangle(pad, hits[3].Y + 20, Width - pad * 2, Math.Max(12, traitHeight - 22)),
                 BodyColor,
-                TextFormatFlags.WordBreak | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
+                TextFormatFlags.WordBreak | TextFormatFlags.NoPadding);
         }
 
         if (keywordHeight > 0)

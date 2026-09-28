@@ -6,7 +6,7 @@ sealed class StatusOverlayForm : OverlayForm
     {
         AutoSize = true,
         Location = new Point(12, 8),
-        ForeColor = Color.FromArgb(190, 230, 190)
+        ForeColor = KitLook.StatusOn
     };
 
     const int WM_NCHITTEST = 0x0084;
@@ -23,8 +23,8 @@ sealed class StatusOverlayForm : OverlayForm
     {
         label.Text = tagging ? $"On   {actionKey}" : $"Off   {actionKey}";
         label.ForeColor = tagging
-            ? Color.FromArgb(255, 160, 140)
-            : Color.FromArgb(190, 230, 190);
+            ? KitLook.StatusOff
+            : KitLook.StatusOn;
         Invalidate(true);
     }
 

@@ -5,11 +5,11 @@ namespace VerminKit;
 
 sealed class LevelBadge : Control
 {
-    static readonly Color RingColor = Color.FromArgb(168, 118, 48);
-    static readonly Color InnerColor = Color.FromArgb(28, 16, 8);
-    static readonly Color NumberColor = Color.FromArgb(232, 196, 120);
+    static readonly Color RingColor = KitLook.LevelRing;
+    static readonly Color InnerColor = KitLook.LevelInner;
+    static readonly Color NumberColor = KitLook.LevelNumber;
 
-    readonly Font numberFont = new("Georgia", 11f, FontStyle.Bold, GraphicsUnit.Point);
+    readonly Font numberFont = KitLook.Level;
 
     public LevelBadge(int level)
     {
@@ -25,13 +25,6 @@ sealed class LevelBadge : Control
     }
 
     public int Level { get; }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-            numberFont.Dispose();
-        base.Dispose(disposing);
-    }
 
     protected override void OnPaint(PaintEventArgs e)
     {
@@ -87,12 +80,12 @@ sealed class LevelBadge : Control
 
 sealed class TalentCell : Control
 {
-    static readonly Color IdleBorder = Color.FromArgb(92, 68, 36);
-    static readonly Color SelectedBorder = Color.FromArgb(214, 146, 48);
-    static readonly Color IdleFill = Color.FromArgb(14, 10, 8);
-    static readonly Color SelectedFill = Color.FromArgb(42, 22, 10);
-    static readonly Color NameColor = Color.FromArgb(236, 228, 214);
-    static readonly Color DetailColor = Color.FromArgb(176, 168, 156);
+    static readonly Color IdleBorder = KitLook.TalentIdleBorder;
+    static readonly Color SelectedBorder = KitLook.TalentSelectedBorder;
+    static readonly Color IdleFill = KitLook.TalentIdleFill;
+    static readonly Color SelectedFill = KitLook.TalentSelectedFill;
+    static readonly Color NameColor = KitLook.Ink;
+    static readonly Color DetailColor = KitLook.TalentDetail;
     static readonly Dictionary<Image, Image> GrayIcons = new();
 
     string talentName = "";

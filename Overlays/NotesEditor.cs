@@ -9,10 +9,10 @@ sealed class NotesEditor : UserControl
     const int EM_LINESCROLL = 0x00B6;
     const int EM_GETFIRSTVISIBLELINE = 0x00CE;
 
-    static readonly Color Paper = Color.FromArgb(22, 14, 10);
-    static readonly Color Ink = Color.FromArgb(236, 226, 210);
-    static readonly Color CardInk = Color.FromArgb(214, 64, 52);
-    static readonly Color Frame = Color.FromArgb(168, 118, 48);
+    static readonly Color Paper = KitLook.Field;
+    static readonly Color Ink = KitLook.Ink;
+    static readonly Color CardInk = KitLook.CardInk;
+    static readonly Color Frame = KitLook.Frame;
 
     readonly RichTextBox box = new()
     {
@@ -37,7 +37,7 @@ sealed class NotesEditor : UserControl
     {
         SetStyle(ControlStyles.ResizeRedraw, true);
         BackColor = Frame;
-        Font = new Font("Segoe UI", 10f, FontStyle.Regular, GraphicsUnit.Point);
+        Font = KitLook.Notes;
         box.Font = Font;
         Controls.Add(box);
         Controls.Add(bar);
@@ -133,9 +133,19 @@ sealed class NotesEditor : UserControl
         box.Focus();
     }
 
-    public void Wheel(int delta)
+    public bool Wheel(int delta)
     {
-        ScrollBy(delta < 0 ? 3 : -3);
+        var first = FirstLine();
+        var last = Math.Max(0, LineCount() - VisibleLines());
+        var goingUp = delta > 0;
+        if (goingUp && first <= 0)
+            return false;
+        if (!goingUp && first >= last)
+            return false;
+
+        ScrollBy(goingUp ? -3 : 3);
+        SyncBar();
+        return FirstLine() != first;
     }
 
     public Rectangle CaretScreenRect()
@@ -264,15 +274,18 @@ sealed class NotesEditor : UserControl
         SendMessage(box.Handle, EM_SETCHARFORMAT, (IntPtr)SCF_SELECTION, ref format);
     }
 
+    int LineCount() =>
+        box.IsHandleCreated ? box.GetLineFromCharIndex(Math.Max(0, box.TextLength)) + 1 : 1;
+
+    int VisibleLines() => Math.Max(1, box.ClientSize.Height / LineHeight);
+
     void SyncBar()
     {
         if (barSync || !box.IsHandleCreated)
             return;
 
-        var total = Math.Max(1, box.GetLineFromCharIndex(Math.Max(0, box.TextLength)) + 1);
-        var visible = Math.Max(1, box.ClientSize.Height / LineHeight);
         barSync = true;
-        bar.SetRange(total, visible, FirstLine());
+        bar.SetRange(Math.Max(1, LineCount()), VisibleLines(), FirstLine());
         barSync = false;
     }
 

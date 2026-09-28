@@ -4,15 +4,15 @@ namespace VerminKit;
 
 sealed class NotesOverlayForm : OverlayForm
 {
-    static readonly Color HintColor = Color.FromArgb(186, 170, 148);
-    static readonly Color Paper = Color.FromArgb(28, 18, 12);
-    static readonly Color Ink = Color.FromArgb(236, 226, 210);
-    static readonly Color Frame = Color.FromArgb(168, 118, 48);
+    static readonly Color HintColor = KitLook.Hint;
+    static readonly Color Paper = KitLook.Paper;
+    static readonly Color Ink = KitLook.Ink;
+    static readonly Color Frame = KitLook.Frame;
     static readonly int[] TalentLevels = [5, 10, 15, 20, 25, 30];
 
     readonly LoadoutBook book;
     readonly IconCatalog icons = new();
-    readonly Font buttonFont = new("Segoe UI", 10f, FontStyle.Regular, GraphicsUnit.Point);
+    readonly Font buttonFont = KitLook.Button;
     readonly bool[] careerShown = new bool[4];
     readonly ToolTip tips = new() { InitialDelay = 300, AutoPopDelay = 30000, ShowAlways = true };
     readonly Image? backdrop;
@@ -23,7 +23,15 @@ sealed class NotesOverlayForm : OverlayForm
     readonly CrestButton[] careerButtons;
     readonly CrestButton loadoutButton;
     readonly Panel nameFrame = new() { BackColor = Frame, Padding = new Padding(1) };
-    readonly TextBox nameBox = new() { MaxLength = 80, BorderStyle = BorderStyle.None };
+    readonly TextBox nameBox = new()
+    {
+        MaxLength = 80,
+        BorderStyle = BorderStyle.None,
+        Multiline = true,
+        AcceptsReturn = false,
+        WordWrap = false,
+        ScrollBars = ScrollBars.None
+    };
     readonly NotesEditor notesEditor = new();
     readonly CrestButton createButton;
     readonly CrestButton deleteButton;
@@ -113,10 +121,9 @@ sealed class NotesOverlayForm : OverlayForm
             RefreshLoadoutNames();
         };
         nameBox.Enter += (_, _) => ClosePicker();
-        nameBox.BackColor = Color.FromArgb(22, 14, 10);
+        nameBox.BackColor = KitLook.Field;
         nameBox.ForeColor = Ink;
         nameBox.Font = buttonFont;
-        nameBox.Dock = DockStyle.Fill;
         nameFrame.Controls.Add(nameBox);
         notesEditor.NotesChanged += (_, _) =>
         {
@@ -176,12 +183,12 @@ sealed class NotesOverlayForm : OverlayForm
         ];
 
         talentsCaption.Text = "TALENTS";
-        talentsCaption.Font = new Font("Georgia", 13f, FontStyle.Bold, GraphicsUnit.Point);
-        talentsCaption.ForeColor = Color.FromArgb(196, 112, 42);
+        talentsCaption.Font = KitLook.Caption;
+        talentsCaption.ForeColor = KitLook.TalentCaption;
         talentsCaption.TextAlign = ContentAlignment.MiddleCenter;
-        talentsCaption.BackColor = Color.FromArgb(18, 12, 8);
+        talentsCaption.BackColor = KitLook.Shade;
         descriptions.Checked = book.ShowDescriptions;
-        descriptions.ForeColor = Color.FromArgb(126, 196, 255);
+        descriptions.ForeColor = KitLook.Link;
         descriptions.CheckedChanged += (_, _) =>
         {
             book.SetShowDescriptions(descriptions.Checked);
@@ -190,21 +197,21 @@ sealed class NotesOverlayForm : OverlayForm
         };
         content.Controls.Add(descriptions);
         content.Controls.Add(talentsCaption);
-        notesCaption.ForeColor = Color.FromArgb(214, 170, 96);
-        notesCaption.BackColor = Color.FromArgb(18, 12, 8);
-        notesCaption.Font = new Font("Georgia", 11f, FontStyle.Bold, GraphicsUnit.Point);
+        notesCaption.ForeColor = KitLook.Frame;
+        notesCaption.BackColor = KitLook.Shade;
+        notesCaption.Font = KitLook.NotesCaption;
         notesCaption.TextAlign = ContentAlignment.MiddleLeft;
         content.Controls.Add(notesCaption);
         content.Controls.Add(notesEditor);
-        talentsCaption.BackColor = Color.FromArgb(18, 12, 8);
-        descriptions.BackColor = Color.FromArgb(18, 12, 8);
+        talentsCaption.BackColor = KitLook.Shade;
+        descriptions.BackColor = KitLook.Shade;
 
         picker.BackColor = Paper;
         picker.ForeColor = Ink;
         picker.TabStop = false;
         pickerCaption.BackColor = Paper;
-        pickerCaption.ForeColor = Color.FromArgb(214, 170, 96);
-        pickerCaption.Font = new Font("Georgia", 9f, FontStyle.Bold, GraphicsUnit.Point);
+        pickerCaption.ForeColor = KitLook.Frame;
+        pickerCaption.Font = KitLook.PickerCaption;
         pickerDetail.BackColor = Paper;
         pickerDetail.ForeColor = HintColor;
         picker.ItemPicked += (_, _) =>
@@ -854,14 +861,16 @@ sealed class NotesOverlayForm : OverlayForm
         var buttonsWidth = buttonWidth * 3 + gap * 2;
         var loadoutWidth = Math.Min(260, Math.Max(160, (inner - buttonsWidth) / 3));
         var nameWidth = Math.Max(80, inner - buttonsWidth - loadoutWidth - gap * 2);
-        loadoutButton.SetBounds(x, y, loadoutWidth, 34);
-        nameFrame.SetBounds(loadoutButton.Right + gap, y, nameWidth, 34);
-        createButton.SetBounds(nameFrame.Right + gap, y, buttonWidth, 34);
-        deleteButton.SetBounds(createButton.Right + gap, y, buttonWidth, 34);
-        CloseButton.SetBounds(deleteButton.Right + gap, y, buttonWidth, 34);
-        y += 44;
+        var barHeight = 44;
+        loadoutButton.SetBounds(x, y, loadoutWidth, barHeight);
+        nameFrame.SetBounds(loadoutButton.Right + gap, y, nameWidth, barHeight);
+        nameBox.SetBounds(8, 8, Math.Max(1, nameWidth - 16), Math.Max(1, barHeight - 16));
+        createButton.SetBounds(nameFrame.Right + gap, y, buttonWidth, barHeight);
+        deleteButton.SetBounds(createButton.Right + gap, y, buttonWidth, barHeight);
+        CloseButton.SetBounds(deleteButton.Right + gap, y, buttonWidth, barHeight);
+        y += barHeight + 10;
 
-        var cardHeight = Math.Clamp(viewHeight * 22 / 100, 200, 280);
+        var cardHeight = Math.Clamp(viewHeight * 28 / 100, 260, 340);
         var cardWidth = (inner - gap * (cards.Length - 1)) / cards.Length;
         for (var index = 0; index < cards.Length; index++)
             cards[index].SetBounds(x + index * (cardWidth + gap), y, cardWidth, cardHeight);
@@ -973,7 +982,8 @@ sealed class NotesOverlayForm : OverlayForm
 
         if (notesEditor.RectangleToScreen(notesEditor.ClientRectangle).Contains(cursor))
         {
-            notesEditor.Wheel(delta);
+            if (!notesEditor.Wheel(delta))
+                board.Bar.Nudge(delta < 0 ? 64 : -64);
             return;
         }
 
@@ -986,11 +996,11 @@ sealed class NotesOverlayForm : OverlayForm
             return;
 
         var selected = (e.State & DrawItemState.Selected) != 0 || e.Index == picker.SelectedIndex;
-        using (var brush = new SolidBrush(selected ? Color.FromArgb(84, 42, 16) : Paper))
+        using (var brush = new SolidBrush(selected ? KitLook.PickSelected : Paper))
             e.Graphics.FillRectangle(brush, e.Bounds);
         if (selected)
         {
-            using var mark = new SolidBrush(Color.FromArgb(214, 154, 58));
+            using var mark = new SolidBrush(KitLook.ButtonChosenBorder);
             e.Graphics.FillRectangle(mark, e.Bounds.Left, e.Bounds.Top, 3, e.Bounds.Height);
         }
 
@@ -1014,7 +1024,7 @@ sealed class NotesOverlayForm : OverlayForm
             choice.Label,
             Font,
             new Rectangle(textX, e.Bounds.Top, Math.Max(1, e.Bounds.Right - textX - 6), e.Bounds.Height),
-            selected ? Color.FromArgb(255, 228, 176) : Ink,
+            selected ? KitLook.PickSelectedText : Ink,
             TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
     }
 
@@ -1064,7 +1074,7 @@ sealed class NotesOverlayForm : OverlayForm
     {
         if (backdrop is null || destination.Width < 1 || destination.Height < 1)
         {
-            graphics.Clear(Color.FromArgb(18, 12, 8));
+            graphics.Clear(KitLook.Shade);
             return;
         }
 

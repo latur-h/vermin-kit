@@ -4,9 +4,9 @@ namespace VerminKit;
 
 sealed class GoldScrollBar : Control
 {
-    static readonly Color TrackColor = Color.FromArgb(28, 18, 12);
-    static readonly Color ThumbColor = Color.FromArgb(168, 118, 48);
-    static readonly Color ThumbHotColor = Color.FromArgb(214, 164, 78);
+    static readonly Color TrackColor = KitLook.ScrollTrack;
+    static readonly Color ThumbColor = KitLook.ScrollThumb;
+    static readonly Color ThumbHotColor = KitLook.ScrollThumbHot;
 
     int value;
     int maximum = 1;
@@ -144,7 +144,7 @@ sealed class BoardCanvas : Panel
             ControlStyles.ResizeRedraw |
             ControlStyles.UserPaint,
             true);
-        BackColor = Color.FromArgb(18, 12, 8);
+        BackColor = KitLook.Shade;
     }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -159,7 +159,7 @@ sealed class BoardCanvas : Panel
 
 sealed class BoardScroll : Panel
 {
-    readonly Panel host = new() { Dock = DockStyle.Fill, BackColor = Color.FromArgb(18, 12, 8) };
+    readonly Panel host = new() { Dock = DockStyle.Fill, BackColor = KitLook.Shade };
 
     public BoardScroll()
     {
