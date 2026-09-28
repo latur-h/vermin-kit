@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Poss.Win.Automation.GlobalHotKeys;
@@ -59,11 +60,7 @@ sealed class TrayApplication : ApplicationContext
             Text = "Vermin Kit is running"
         };
 
-        var menu = new ContextMenuStrip();
-        var exit = new ToolStripMenuItem("Exit");
-        exit.Click += (_, _) => Shutdown();
-        menu.Items.Add(exit);
-        notifyIcon.ContextMenuStrip = menu;
+        notifyIcon.ContextMenuStrip = CreateMenu();
 
         try
         {
@@ -481,6 +478,50 @@ sealed class TrayApplication : ApplicationContext
     static string Bare(string name) =>
         name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ? name[..^4] : name;
 
+    ContextMenuStrip CreateMenu()
+    {
+        var menu = new ContextMenuStrip
+        {
+            Renderer = new TrayMenuRenderer(),
+            BackColor = KitLook.Paper,
+            ForeColor = KitLook.Ink,
+            Font = new Font("Segoe UI", 10f, FontStyle.Regular, GraphicsUnit.Point),
+            ShowImageMargin = false,
+            Padding = new Padding(4, 6, 4, 6)
+        };
+        var open = MenuItem("Open config folder");
+        open.Click += (_, _) => OpenConfigFolder();
+        var exit = MenuItem("Exit");
+        exit.Click += (_, _) => Shutdown();
+        menu.Items.Add(open);
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(exit);
+        return menu;
+    }
+
+    static ToolStripMenuItem MenuItem(string text) => new(text)
+    {
+        ForeColor = KitLook.Ink,
+        BackColor = KitLook.Paper,
+        Padding = new Padding(8, 4, 12, 4)
+    };
+
+    static void OpenConfigFolder()
+    {
+        try
+        {
+            Directory.CreateDirectory(TagConfigStore.DirectoryPath);
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = TagConfigStore.DirectoryPath,
+                UseShellExecute = true
+            });
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or Win32Exception)
+        {
+        }
+    }
+
     void Shutdown()
     {
         Cleanup();
@@ -520,16 +561,18 @@ sealed class TrayApplication : ApplicationContext
         {
             graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             graphics.Clear(Color.Transparent);
-            using var brush = new SolidBrush(Color.FromArgb(176, 52, 40));
-            graphics.FillEllipse(brush, 1, 1, 30, 30);
-            using var font = new Font("Segoe UI", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
-            using var text = new SolidBrush(Color.White);
+            using var fill = new SolidBrush(KitLook.LevelInner);
+            using var ring = new Pen(KitLook.LevelRing, 2f);
+            graphics.FillEllipse(fill, 2, 2, 28, 28);
+            graphics.DrawEllipse(ring, 2, 2, 28, 28);
+            using var font = new Font("Georgia", 15f, FontStyle.Bold, GraphicsUnit.Pixel);
+            using var text = new SolidBrush(KitLook.LevelNumber);
             using var format = new StringFormat
             {
                 Alignment = StringAlignment.Center,
                 LineAlignment = StringAlignment.Center
             };
-            graphics.DrawString("V", font, text, new RectangleF(0, 0, 32, 32), format);
+            graphics.DrawString("V", font, text, new RectangleF(0, 1, 32, 32), format);
         }
 
         var handle = bitmap.GetHicon();
@@ -546,4 +589,35 @@ sealed class TrayApplication : ApplicationContext
 
     [DllImport("user32.dll", CharSet = CharSet.Auto)]
     static extern bool DestroyIcon(IntPtr handle);
+
+    sealed class TrayMenuRenderer : ToolStripProfessionalRenderer
+    {
+        public TrayMenuRenderer() : base(new TrayMenuColors())
+        {
+            RoundedEdges = false;
+        }
+
+        protected override void OnRenderItemText(ToolStripItemTextRenderEventArgs e)
+        {
+            e.TextColor = KitLook.Ink;
+            base.OnRenderItemText(e);
+        }
+    }
+
+    sealed class TrayMenuColors : ProfessionalColorTable
+    {
+        public override Color MenuItemSelected => KitLook.ButtonHot;
+        public override Color MenuItemSelectedGradientBegin => KitLook.ButtonHot;
+        public override Color MenuItemSelectedGradientEnd => KitLook.ButtonHot;
+        public override Color MenuItemPressedGradientBegin => KitLook.ButtonChosen;
+        public override Color MenuItemPressedGradientEnd => KitLook.ButtonChosen;
+        public override Color MenuItemBorder => KitLook.Frame;
+        public override Color MenuBorder => KitLook.Frame;
+        public override Color ToolStripDropDownBackground => KitLook.Paper;
+        public override Color ImageMarginGradientBegin => KitLook.Paper;
+        public override Color ImageMarginGradientMiddle => KitLook.Paper;
+        public override Color ImageMarginGradientEnd => KitLook.Paper;
+        public override Color SeparatorDark => KitLook.Frame;
+        public override Color SeparatorLight => KitLook.Frame;
+    }
 }

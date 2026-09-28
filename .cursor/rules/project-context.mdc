@@ -10,7 +10,7 @@ Windows tray app that holds a tag key in Vermintide 2 while that game is focused
 ## Files
 
 - `Program.cs` — mutex `Local\VerminKit`, then `Application.Run(new TrayApplication())`. Abandoned mutex counts as owned. Second instance exits.
-- `App/TrayApplication.cs` — tray icon, hotkeys, tag loop, 100 ms placement timer.
+- `App/TrayApplication.cs` — tray icon, hotkeys, tag loop, 100 ms placement timer. The tray menu opens `%LocalAppData%\Vermin Kit` or exits.
 - `Settings/TagSettings.cs` — locked snapshot and setters. `TagSnapshot` is the read model.
 - `Settings/TagConfigStore.cs` — JSON load/save.
 - `Settings/TagKeyHelper.cs` — normalize keys, `"Key Down"` / `"Key Up"` strokes, which key to capture.
