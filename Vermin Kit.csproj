@@ -17,4 +17,10 @@
     <EmbeddedResource Include="Catalog\catalog.json" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Catalog\icons\**\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

@@ -101,11 +101,57 @@ class OverlayForm : Form
         SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_HIDEWINDOW);
     }
 
+    public void BringAbove()
+    {
+        if (!IsHandleCreated || !Visible)
+            return;
+
+        SetWindowPos(Handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
+    }
+
     public void CloseForExit()
     {
         allowClose = true;
         Close();
     }
+
+    protected void AcceptMouse()
+    {
+        if (!IsHandleCreated)
+            return;
+
+        var style = ReadExStyle(Handle);
+        var cleared = style & ~WS_EX_NOACTIVATE;
+        if (cleared == style)
+            return;
+
+        WriteExStyle(Handle, cleared);
+    }
+
+    const int GWL_EXSTYLE = -20;
+
+    static long ReadExStyle(IntPtr handle) =>
+        IntPtr.Size == 8 ? GetWindowLongPtr64(handle, GWL_EXSTYLE).ToInt64() : GetWindowLong32(handle, GWL_EXSTYLE);
+
+    static void WriteExStyle(IntPtr handle, long style)
+    {
+        if (IntPtr.Size == 8)
+            SetWindowLongPtr64(handle, GWL_EXSTYLE, new IntPtr(style));
+        else
+            SetWindowLong32(handle, GWL_EXSTYLE, (int)style);
+    }
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
+    static extern int GetWindowLong32(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLong", SetLastError = true)]
+    static extern int SetWindowLong32(IntPtr hWnd, int nIndex, int dwNewLong);
+
+    [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
+    static extern IntPtr GetWindowLongPtr64(IntPtr hWnd, int nIndex);
+
+    [DllImport("user32.dll", EntryPoint = "SetWindowLongPtr", SetLastError = true)]
+    static extern IntPtr SetWindowLongPtr64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
@@ -134,6 +180,29 @@ sealed class NoFocusButton : Button
         if (m.Msg == WM_MOUSEACTIVATE)
         {
             m.Result = (IntPtr)MA_NOACTIVATE;
+            return;
+        }
+
+        base.WndProc(ref m);
+    }
+}
+
+sealed class BoardButton : Button
+{
+    const int WM_MOUSEACTIVATE = 0x0021;
+    const int MA_ACTIVATE = 1;
+
+    public BoardButton()
+    {
+        FlatStyle = FlatStyle.Flat;
+        Cursor = Cursors.Hand;
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+        if (m.Msg == WM_MOUSEACTIVATE)
+        {
+            m.Result = (IntPtr)MA_ACTIVATE;
             return;
         }
 

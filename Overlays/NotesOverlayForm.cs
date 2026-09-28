@@ -2,7 +2,7 @@ namespace VerminKit;
 
 sealed class NotesOverlayForm : OverlayForm
 {
-    const int CardHeight = 176;
+    const int CardHeight = 188;
 
     static readonly Color PanelColor = Color.FromArgb(28, 28, 28);
     static readonly Color ButtonColor = Color.FromArgb(48, 48, 48);
@@ -13,6 +13,8 @@ sealed class NotesOverlayForm : OverlayForm
     static readonly int[] TalentLevels = [5, 10, 15, 20, 25, 30];
 
     readonly LoadoutBook book;
+    readonly IconCatalog icons = new();
+    readonly bool[] careerShown = new bool[4];
     readonly ToolTip tips = new() { InitialDelay = 300, AutoPopDelay = 30000, ShowAlways = true };
     readonly Panel scroll = new() { Dock = DockStyle.Fill, AutoScroll = true };
     readonly Button[] heroButtons;
@@ -34,7 +36,13 @@ sealed class NotesOverlayForm : OverlayForm
     readonly Button[,] talents = new Button[6, 3];
     readonly Label[] levels = new Label[6];
     readonly Label pickerCaption = new() { AutoSize = false, ForeColor = HintColor };
-    readonly ListBox picker = new() { IntegralHeight = false, BorderStyle = BorderStyle.FixedSingle };
+    readonly ListBox picker = new()
+    {
+        IntegralHeight = false,
+        BorderStyle = BorderStyle.FixedSingle,
+        DrawMode = DrawMode.OwnerDrawFixed,
+        ItemHeight = 28
+    };
     readonly Label pickerDetail = new() { AutoSize = false, ForeColor = HintColor };
     readonly Label talentsCaption = new() { Text = "Talents", AutoSize = false };
     readonly Label notesCaption = new() { Text = "Play notes", AutoSize = false };
@@ -66,6 +74,7 @@ sealed class NotesOverlayForm : OverlayForm
                 ClosePicker();
                 RefreshBoard();
             };
+            SetIcon(heroButtons[index], icons.Hero(heroId));
             scroll.Controls.Add(heroButtons[index]);
         }
 
@@ -168,6 +177,7 @@ sealed class NotesOverlayForm : OverlayForm
         StyleField(notesBox);
         loadouts.BackColor = Color.FromArgb(22, 22, 22);
         loadouts.ForeColor = Color.FromArgb(235, 235, 235);
+        loadouts.FlatStyle = FlatStyle.Flat;
         picker.BackColor = Color.FromArgb(22, 22, 22);
         picker.ForeColor = Color.FromArgb(235, 235, 235);
         pickerCaption.BackColor = PanelColor;
@@ -181,6 +191,7 @@ sealed class NotesOverlayForm : OverlayForm
                 return;
             ApplyPick(choice);
         };
+        picker.DrawItem += DrawPick;
         picker.MouseMove += (_, args) =>
         {
             var index = picker.IndexFromPoint(args.Location);
@@ -245,8 +256,10 @@ sealed class NotesOverlayForm : OverlayForm
             for (var index = 0; index < careerButtons.Length; index++)
             {
                 var career = hero is not null && index < hero.Careers.Count ? hero.Careers[index] : null;
-                careerButtons[index].Visible = career is not null;
+                careerShown[index] = career is not null;
+                careerButtons[index].Visible = careerShown[index];
                 careerButtons[index].Text = career?.Name ?? "";
+                SetIcon(careerButtons[index], career is null ? null : icons.Career(career.Id));
                 PaintSelected(careerButtons[index], career?.Id == book.Career.Id);
             }
 
@@ -305,15 +318,18 @@ sealed class NotesOverlayForm : OverlayForm
         {
             var gear = book.Gear(card.Slot);
             var weapon = book.Catalog.FindWeapon(gear?.WeaponId);
+            card.Icon.Image = SlotIcon(card.Slot);
             if (card.HasWeapon)
             {
                 card.Weapon.Text = weapon?.Name ?? "Choose weapon";
                 card.Keywords.Text = weapon?.Keywords ?? "";
                 card.Weapon.Enabled = enabled;
+                SetIcon(card.Weapon, icons.Weapon(gear?.WeaponId));
             }
 
             var trait = book.Catalog.FindTrait(book.TraitGroup(card.Slot), gear?.TraitId);
             card.Trait.Text = trait?.Name ?? "Choose trait";
+            SetIcon(card.Trait, icons.Trait(gear?.TraitId));
             card.Trait.Enabled = enabled && book.TraitGroup(card.Slot) is not null;
             tips.SetToolTip(card.Trait, trait?.Description ?? "");
 
@@ -345,6 +361,7 @@ sealed class NotesOverlayForm : OverlayForm
                     : descriptions.Checked
                         ? talent.Name + "\n" + talent.Description
                         : talent.Name;
+                SetIcon(button, talent is null ? null : icons.Talent(career.Id, row, column));
                 tips.SetToolTip(button, talent?.Description ?? "");
                 PaintSelected(button, book.Current is { } current && current.Talents[row] == column);
             }
@@ -507,10 +524,17 @@ sealed class NotesOverlayForm : OverlayForm
         var x = 12;
         var y = 12;
 
-        PlaceRow(heroButtons, x, y, inner, 34);
-        y += 42;
-        PlaceRow(careerButtons.Where(static button => button.Visible).ToArray(), x, y, inner, 40);
-        y += 48;
+        var shownCareers = new List<Control>(careerButtons.Length);
+        for (var index = 0; index < careerButtons.Length; index++)
+        {
+            if (careerShown[index])
+                shownCareers.Add(careerButtons[index]);
+        }
+
+        PlaceRow(heroButtons, x, y, inner, 42);
+        y += 50;
+        PlaceRow(shownCareers.ToArray(), x, y, inner, 52);
+        y += 60;
 
         var buttonWidth = 72;
         var buttonsWidth = buttonWidth * 3 + gap * 2;
@@ -558,7 +582,7 @@ sealed class NotesOverlayForm : OverlayForm
         var cellWidth = (inner - levelWidth - gap * 3) / 3;
         for (var row = 0; row < 6; row++)
         {
-            var cellHeight = 36;
+            var cellHeight = 40;
             if (descriptions.Checked)
             {
                 for (var column = 0; column < 3; column++)
@@ -609,13 +633,20 @@ sealed class NotesOverlayForm : OverlayForm
     CardUi MakeCard(string slot, string title, bool hasWeapon)
     {
         var panel = new Panel { BackColor = Color.FromArgb(36, 32, 30), Height = CardHeight };
+        var icon = new PictureBox
+        {
+            BackColor = panel.BackColor,
+            Location = new Point(8, 4),
+            Size = new Size(20, 20),
+            SizeMode = PictureBoxSizeMode.Zoom
+        };
         var heading = new Label
         {
             Text = title,
             ForeColor = Color.FromArgb(212, 168, 92),
             BackColor = panel.BackColor,
-            Location = new Point(8, 6),
-            Size = new Size(180, 18),
+            Location = new Point(32, 6),
+            Size = new Size(156, 18),
             Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
         };
         var weapon = MakeButton("Choose weapon");
@@ -623,28 +654,29 @@ sealed class NotesOverlayForm : OverlayForm
         {
             ForeColor = HintColor,
             BackColor = panel.BackColor,
-            Location = new Point(8, 54),
+            Location = new Point(8, 60),
             Size = new Size(180, 32),
             Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right
         };
         var trait = MakeButton("Choose trait");
         var propertyA = MakeButton("Choose property");
         var propertyB = MakeButton("Choose property");
+        panel.Controls.Add(icon);
         panel.Controls.Add(heading);
         panel.Controls.Add(keywords);
         if (hasWeapon)
         {
-            weapon.SetBounds(8, 26, 180, 26);
-            trait.SetBounds(8, 88, 180, 26);
-            propertyA.SetBounds(8, 116, 180, 26);
-            propertyB.SetBounds(8, 144, 180, 26);
+            weapon.SetBounds(8, 28, 180, 30);
+            trait.SetBounds(8, 94, 180, 30);
+            propertyA.SetBounds(8, 126, 180, 26);
+            propertyB.SetBounds(8, 154, 180, 26);
         }
         else
         {
             weapon.Visible = false;
             keywords.Visible = false;
-            trait.SetBounds(8, 32, 180, 26);
-            propertyA.SetBounds(8, 64, 180, 26);
+            trait.SetBounds(8, 32, 180, 30);
+            propertyA.SetBounds(8, 66, 180, 26);
             propertyB.SetBounds(8, 96, 180, 26);
         }
 
@@ -659,12 +691,12 @@ sealed class NotesOverlayForm : OverlayForm
         propertyA.Click += (_, _) => OpenPicker(slot, "property-a");
         propertyB.Click += (_, _) => OpenPicker(slot, "property-b");
         scroll.Controls.Add(panel);
-        return new CardUi(slot, hasWeapon, panel, weapon, keywords, trait, propertyA, propertyB);
+        return new CardUi(slot, hasWeapon, panel, icon, weapon, keywords, trait, propertyA, propertyB);
     }
 
     Button MakeButton(string text)
     {
-        var button = new Button
+        var button = new BoardButton
         {
             Text = text,
             FlatStyle = FlatStyle.Flat,
@@ -678,6 +710,84 @@ sealed class NotesOverlayForm : OverlayForm
         button.FlatAppearance.MouseOverBackColor = Color.FromArgb(64, 64, 64);
         button.FlatAppearance.MouseDownBackColor = Color.FromArgb(84, 84, 84);
         return button;
+    }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        AcceptMouse();
+    }
+
+    protected override void WndProc(ref Message m)
+    {
+        const int WM_MOUSEACTIVATE = 0x0021;
+        const int MA_ACTIVATE = 1;
+        if (m.Msg == WM_MOUSEACTIVATE)
+        {
+            m.Result = (IntPtr)MA_ACTIVATE;
+            return;
+        }
+
+        base.WndProc(ref m);
+    }
+
+    protected override void OnVisibleChanged(EventArgs e)
+    {
+        base.OnVisibleChanged(e);
+        if (Visible)
+            LayoutBoard();
+    }
+
+    void DrawPick(object? sender, DrawItemEventArgs e)
+    {
+        if (e.Index < 0 || e.Index >= picker.Items.Count || picker.Items[e.Index] is not PickChoice choice)
+            return;
+
+        var selected = (e.State & DrawItemState.Selected) != 0;
+        using var brush = new SolidBrush(selected ? SelectedColor : picker.BackColor);
+        e.Graphics.FillRectangle(brush, e.Bounds);
+
+        var image = pickerField == "weapon"
+            ? icons.Weapon(choice.Id)
+            : pickerField == "trait" ? icons.Trait(choice.Id) : null;
+        var textX = e.Bounds.Left + 6;
+        if (image is not null)
+        {
+            var imageY = e.Bounds.Top + Math.Max(0, (e.Bounds.Height - image.Height) / 2);
+            e.Graphics.DrawImage(image, e.Bounds.Left + 4, imageY, image.Width, image.Height);
+            textX += image.Width + 6;
+        }
+
+        TextRenderer.DrawText(
+            e.Graphics,
+            choice.Label,
+            Font,
+            new Rectangle(textX, e.Bounds.Top, Math.Max(1, e.Bounds.Right - textX), e.Bounds.Height),
+            ForeColor,
+            TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis | TextFormatFlags.NoPadding);
+    }
+
+    Image? SlotIcon(string slot)
+    {
+        if (slot == "necklace")
+            return icons.Slot("necklace");
+        if (slot == "charm")
+            return icons.Slot("charm");
+        if (slot == "trinket")
+            return icons.Slot("trinket");
+        if (slot == "secondary" && book.Career.Id is not ("grail-knight" or "warrior-priest-of-sigmar" or "slayer"))
+            return icons.Slot("ranged");
+        return icons.Slot("melee");
+    }
+
+    static void SetIcon(Button button, Image? image)
+    {
+        button.Image = image;
+        if (image is null)
+            return;
+
+        button.ImageAlign = ContentAlignment.MiddleLeft;
+        button.TextImageRelation = TextImageRelation.ImageBeforeText;
     }
 
     static void PaintSelected(Button button, bool selected)
@@ -699,6 +809,7 @@ sealed class NotesOverlayForm : OverlayForm
         string Slot,
         bool HasWeapon,
         Panel Panel,
+        PictureBox Icon,
         Button Weapon,
         Label Keywords,
         Button Trait,

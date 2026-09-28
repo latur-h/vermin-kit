@@ -249,6 +249,12 @@ sealed class TrayApplication : ApplicationContext
         }
 #endif
 
+        if (notesOpen && dragging)
+        {
+            dragging = false;
+            placementTimer.Interval = 100;
+        }
+
         if (dragging)
         {
             TrackDrag(bounds);
@@ -258,7 +264,18 @@ sealed class TrayApplication : ApplicationContext
 
         var statusSize = statusForm.Measure();
         var statusPoint = settings.ResolveStatus(bounds, statusSize);
-        Place(statusForm, statusPoint, statusSize, ref statusPointShown, ref statusSizeShown, ref statusVisible);
+        if (notesOpen)
+        {
+            if (statusVisible)
+            {
+                statusForm.Conceal();
+                statusVisible = false;
+            }
+        }
+        else
+        {
+            Place(statusForm, statusPoint, statusSize, ref statusPointShown, ref statusSizeShown, ref statusVisible);
+        }
 
         if (!settingsOpen)
         {
@@ -293,6 +310,8 @@ sealed class TrayApplication : ApplicationContext
             Math.Max(1, bounds.Height - OverlayPlacement.Margin * 2));
         var notesPoint = new Point(bounds.Left + OverlayPlacement.Margin, bounds.Top + OverlayPlacement.Margin);
         Place(notesForm, notesPoint, notesSize, ref notesPointShown, ref notesSizeShown, ref notesVisible);
+        if (settingsVisible)
+            notesForm.BringAbove();
         return;
 
     }

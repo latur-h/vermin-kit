@@ -15,7 +15,8 @@ Windows tray app that holds a tag key in Vermintide 2 while that game is focused
 - `Settings/TagConfigStore.cs` — JSON load/save.
 - `Settings/TagKeyHelper.cs` — normalize keys, `"Key Down"` / `"Key Up"` strokes, which key to capture.
 - `Catalog/catalog.json` — heroes, careers, weapons, red properties, traits, and talent text. Embedded in the executable.
-- `Catalog/GameCatalog.cs` — reads that catalog.
+- `Catalog/icons/` — Ranald portraits, talent icons, weapon icons, trait icons, and slot icons. Copied beside the executable.
+- `Catalog/GameCatalog.cs` — reads the JSON catalog. `IconCatalog` loads the pngs.
 - `Notes/LoadoutBook.cs` — many named loadouts per career. Mutations save immediately.
 - `Notes/LoadoutStore.cs` — JSON load/save for notes.
 - `Overlays/NotesOverlayForm.cs` — F6 loadout board.
@@ -32,7 +33,7 @@ Target process is `vermintide2_dx12.exe`. Hotkeys run only when that window is a
 - Edit is fixed `F5` and toggles the settings overlay. Notes is fixed `F6` and toggles the loadout board. Neither can be assigned as a tag or hotkey.
 - Hotkey ids are `"activate"`, `"deactivate"`, `"edit"`, `"notes"`. Changing activate/deactivate calls `hotkeys.Change`.
 - The timer tracks the game rect. Overlays hide unless the game is foreground or this process is. A Debug build keeps them up without that, and does not save a drag while the fallback desktop rect is in use. Bounds under 50 px, or left/top below -1000, are ignored. While dragging, the timer is 16 ms; on release it saves the status offset and returns to 100 ms.
-- F6 opens the loadout board inside the game window. It fills that window inside the 12 px margin and scrolls. Showing it does not take focus. A click does, so the play note can be typed. Each career has many named loadouts: primary, secondary, necklace, charm, trinket, six talent rows, and a play note. Weapon lists are the career allow-list. Properties and traits are the red values. Hover a talent or trait for the full description. `Show descriptions` prints talent text on the grid. F6 again, or Close, hides the board.
+- F6 opens the loadout board inside the game window. It fills that window inside the 12 px margin and scrolls. The status chip hides while the board is open. Showing the board does not take focus. A click does, so the play note can be typed. Hero, career, weapon, trait, and talent buttons draw icons from `Catalog/icons`. Each career has many named loadouts: primary, secondary, necklace, charm, trinket, six talent rows, and a play note. Weapon lists are the career allow-list. Properties and traits are the red values. Hover a talent or trait for the full description. `Show descriptions` prints talent text on the grid. F6 again, or Close, hides the board and the status chip returns.
 - Status text shows the key that does the next action: activate key when off, deactivate key when on.
 
 ## Config
@@ -45,7 +46,7 @@ Defaults: tag key `XButton1`, tag delay 300, key gap 10, activate `F1`, deactiva
 
 ## Do not break
 
-- The status chip and the settings panel must not take focus: `WS_EX_NOACTIVATE`, `ShowWithoutActivation`, `WM_MOUSEACTIVATE` → `MA_NOACTIVATE`. Status `WM_NCHITTEST` returns `HTTRANSPARENT`. The notes board uses `ShowWithoutActivation` so F6 does not steal focus, and it accepts a click so the play note can be typed.
+- The status chip and the settings panel must not take focus: `WS_EX_NOACTIVATE`, `ShowWithoutActivation`, `WM_MOUSEACTIVATE` → `MA_NOACTIVATE`. Status `WM_NCHITTEST` returns `HTTRANSPARENT`. The notes board uses `ShowWithoutActivation` so F6 does not steal focus, strips `WS_EX_NOACTIVATE`, and accepts a click so the play note can be typed. Career buttons are placed from `careerShown`, because `Control.Visible` is false until the form itself is shown.
 - Settings mutations go through `TagSettings` and save immediately. Read state with `Snapshot()`.
 - Placement stays inside the game window with a 12 px margin (`OverlayPlacement.Margin`). Editor sits 8 px under the chip, or above if it would not fit.
 - Key capture waits for keys already down to release, then picks the first non-modifier (`TagKeyHelper.Pick`). Timeout is 5 seconds.
