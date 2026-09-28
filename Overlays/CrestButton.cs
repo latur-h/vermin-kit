@@ -107,7 +107,7 @@ sealed class CrestButton : BoardButton
 
         var menuWidth = menu ? 18 : 0;
         var text = Text ?? "";
-        var flags = TextFormatFlags.NoPadding | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis;
+        var flags = TextFormatFlags.NoPadding | TextFormatFlags.SingleLine | TextFormatFlags.VerticalCenter | TextFormatFlags.EndEllipsis;
         var textSize = TextRenderer.MeasureText(graphics, text, Font, Size.Empty, TextFormatFlags.NoPadding);
         var icon = mark?.Width ?? 0;
         var gap = icon > 0 && text.Length > 0 ? 8 : 0;

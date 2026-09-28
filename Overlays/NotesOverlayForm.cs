@@ -27,10 +27,7 @@ sealed class NotesOverlayForm : OverlayForm
     {
         MaxLength = 80,
         BorderStyle = BorderStyle.None,
-        Multiline = true,
-        AcceptsReturn = false,
-        WordWrap = false,
-        ScrollBars = ScrollBars.None
+        AutoSize = false
     };
     readonly NotesEditor notesEditor = new();
     readonly CrestButton createButton;
@@ -123,7 +120,7 @@ sealed class NotesOverlayForm : OverlayForm
         nameBox.Enter += (_, _) => ClosePicker();
         nameBox.BackColor = KitLook.Field;
         nameBox.ForeColor = Ink;
-        nameBox.Font = buttonFont;
+        nameBox.Font = KitLook.LoadoutName;
         nameFrame.Controls.Add(nameBox);
         notesEditor.NotesChanged += (_, _) =>
         {
@@ -135,6 +132,7 @@ sealed class NotesOverlayForm : OverlayForm
         notesEditor.EscapePressed += (_, _) => ClosePicker();
         notesEditor.Hovered += ShowHover;
         notesEditor.HoverCleared += (_, _) => HideHover();
+        notesEditor.WheelPassed += delta => board.Bar.Nudge(delta < 0 ? 64 : -64);
         createButton = MakeButton("New");
         createButton.Click += (_, _) =>
         {
@@ -214,6 +212,9 @@ sealed class NotesOverlayForm : OverlayForm
         pickerCaption.Font = KitLook.PickerCaption;
         pickerDetail.BackColor = Paper;
         pickerDetail.ForeColor = HintColor;
+        pickerDetail.Font = KitLook.Ui;
+        pickerDetail.UseMnemonic = false;
+        pickerDetail.TextAlign = ContentAlignment.TopLeft;
         picker.ItemPicked += (_, _) =>
         {
             if (Suppressed || picker.SelectedItem is not PickChoice choice)
@@ -560,7 +561,10 @@ sealed class NotesOverlayForm : OverlayForm
         limits.Inflate(-8, -8);
         var rows = Math.Min(8, Math.Max(1, picker.Items.Count));
         const int captionHeight = 24;
-        var detailHeight = pickerDetail.Visible && pickerDetail.Text.Length > 0 ? 32 : 0;
+        var width = Math.Clamp(MeasurePopupWidth(), 160, Math.Max(160, limits.Width - 16));
+        var detailHeight = DetailHeight(width);
+        var maxDetail = Math.Max(picker.ItemHeight, limits.Height - captionHeight - picker.ItemHeight - 8);
+        detailHeight = Math.Min(detailHeight, maxDetail);
         pickerDetail.Visible = detailHeight > 0;
         var chrome = 2 + captionHeight + detailHeight;
         var below = limits.Bottom - (anchor.Bottom + 2);
@@ -572,7 +576,6 @@ sealed class NotesOverlayForm : OverlayForm
             rows = Math.Max(1, (limits.Height - chrome) / picker.ItemHeight);
 
         var listHeight = rows * picker.ItemHeight;
-        var width = Math.Clamp(MeasurePopupWidth(), 160, Math.Max(160, limits.Width - 16));
         var height = chrome + listHeight;
         var x = Math.Clamp(anchor.Left, limits.Left, Math.Max(limits.Left, limits.Right - width));
         var y = anchor.Bottom + 2;
@@ -590,6 +593,20 @@ sealed class NotesOverlayForm : OverlayForm
         pickerDetail.SetBounds(1, picker.Bottom, inner, detailHeight);
         pickerHost.SetBounds(x, y, width, height);
         SyncPickerBar();
+    }
+
+    int DetailHeight(int width)
+    {
+        if (pickerDetail.Text.Length == 0)
+            return 0;
+
+        var textWidth = Math.Max(40, width - 2 - pickerDetail.Padding.Horizontal);
+        var size = TextRenderer.MeasureText(
+            pickerDetail.Text,
+            pickerDetail.Font,
+            new Size(textWidth, int.MaxValue),
+            TextFormatFlags.WordBreak | TextFormatFlags.TextBoxControl);
+        return size.Height + pickerDetail.Padding.Vertical;
     }
 
     int MeasurePopupWidth()
@@ -864,7 +881,9 @@ sealed class NotesOverlayForm : OverlayForm
         var barHeight = 44;
         loadoutButton.SetBounds(x, y, loadoutWidth, barHeight);
         nameFrame.SetBounds(loadoutButton.Right + gap, y, nameWidth, barHeight);
-        nameBox.SetBounds(8, 8, Math.Max(1, nameWidth - 16), Math.Max(1, barHeight - 16));
+        var nameHeight = Math.Max(nameBox.Font.Height + 4, nameBox.PreferredHeight);
+        var nameTop = Math.Max(2, (barHeight - nameHeight) / 2);
+        nameBox.SetBounds(8, nameTop, Math.Max(1, nameWidth - 16), nameHeight);
         createButton.SetBounds(nameFrame.Right + gap, y, buttonWidth, barHeight);
         deleteButton.SetBounds(createButton.Right + gap, y, buttonWidth, barHeight);
         CloseButton.SetBounds(deleteButton.Right + gap, y, buttonWidth, barHeight);

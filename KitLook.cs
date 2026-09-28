@@ -5,6 +5,7 @@ static class KitLook
     public static Font Ui { get; } = new("Segoe UI", 10f, FontStyle.Regular, GraphicsUnit.Point);
     public static Font Notes { get; } = new("Segoe UI", 13f, FontStyle.Regular, GraphicsUnit.Point);
     public static Font Button { get; } = new("Segoe UI", 10f, FontStyle.Regular, GraphicsUnit.Point);
+    public static Font LoadoutName { get; } = new("Segoe UI", 14f, FontStyle.Regular, GraphicsUnit.Point);
     public static Font Overlay { get; } = new("Segoe UI", 9f, FontStyle.Regular, GraphicsUnit.Point);
     public static Font Caption { get; } = new("Georgia", 13f, FontStyle.Bold, GraphicsUnit.Point);
     public static Font NotesCaption { get; } = new("Georgia", 12f, FontStyle.Bold, GraphicsUnit.Point);

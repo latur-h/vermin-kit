@@ -6,8 +6,8 @@ namespace VerminKit;
 sealed class NotesEditor : UserControl
 {
     const int WM_SETREDRAW = 0x000B;
-    const int EM_LINESCROLL = 0x00B6;
-    const int EM_GETFIRSTVISIBLELINE = 0x00CE;
+    const int EM_GETSCROLLPOS = 0x04DD;
+    const int EM_SETSCROLLPOS = 0x04DE;
 
     static readonly Color Paper = KitLook.Field;
     static readonly Color Ink = KitLook.Ink;
@@ -60,6 +60,7 @@ sealed class NotesEditor : UserControl
         };
         box.MouseMove += (_, args) => Hit(args.Location);
         box.MouseLeave += (_, _) => ClearHover();
+        box.MouseWheel += (_, args) => OnWheel(args);
         box.KeyDown += (_, args) =>
         {
             if (args.KeyCode != Keys.Escape)
@@ -86,6 +87,8 @@ sealed class NotesEditor : UserControl
     public event Action<int>? Hovered;
 
     public event EventHandler? HoverCleared;
+
+    public event Action<int>? WheelPassed;
 
     public int Caret => box.SelectionStart;
 
@@ -135,17 +138,28 @@ sealed class NotesEditor : UserControl
 
     public bool Wheel(int delta)
     {
-        var first = FirstLine();
-        var last = Math.Max(0, LineCount() - VisibleLines());
-        var goingUp = delta > 0;
-        if (goingUp && first <= 0)
-            return false;
-        if (!goingUp && first >= last)
+        if (!box.IsHandleCreated || delta == 0)
             return false;
 
-        ScrollBy(goingUp ? -3 : 3);
+        var pos = ScrollPoint();
+        var limit = ScrollLimit(pos);
+        var goingUp = delta > 0;
+        if (goingUp && pos.Y <= 1)
+            return false;
+        if (!goingUp && pos.Y >= limit - 1)
+            return false;
+
+        var step = Math.Max(1, LineHeight * 3);
+        pos.Y = goingUp ? Math.Max(0, pos.Y - step) : Math.Min(limit, pos.Y + step);
+        var before = ScrollPoint().Y;
+        SetScrollPoint(pos);
         SyncBar();
-        return FirstLine() != first;
+        return ScrollPoint().Y != before;
+    }
+
+    protected override void OnMouseWheel(MouseEventArgs e)
+    {
+        OnWheel(e);
     }
 
     public Rectangle CaretScreenRect()
@@ -180,7 +194,7 @@ sealed class NotesEditor : UserControl
         painting = true;
         var caret = box.SelectionStart;
         var length = box.SelectionLength;
-        var scroll = FirstLine();
+        var scroll = ScrollPoint();
         SendMessage(box.Handle, WM_SETREDRAW, 0, 0);
         try
         {
@@ -228,9 +242,8 @@ sealed class NotesEditor : UserControl
             var inside = NoteMarkup.SpanAt(box.Text, caret) is not null && (length > 0 || caret < box.TextLength);
             box.SelectionColor = inside ? CardInk : Ink;
             box.Select(Math.Clamp(caret, 0, box.TextLength), length);
-            var back = FirstLine();
-            if (back != scroll)
-                ScrollBy(scroll - back);
+            if (ScrollPoint() != scroll)
+                SetScrollPoint(scroll);
         }
         finally
         {
@@ -274,40 +287,60 @@ sealed class NotesEditor : UserControl
         SendMessage(box.Handle, EM_SETCHARFORMAT, (IntPtr)SCF_SELECTION, ref format);
     }
 
-    int LineCount() =>
-        box.IsHandleCreated ? box.GetLineFromCharIndex(Math.Max(0, box.TextLength)) + 1 : 1;
-
-    int VisibleLines() => Math.Max(1, box.ClientSize.Height / LineHeight);
+    void OnWheel(MouseEventArgs args)
+    {
+        if (!Wheel(args.Delta))
+            WheelPassed?.Invoke(args.Delta);
+        if (args is HandledMouseEventArgs handled)
+            handled.Handled = true;
+    }
 
     void SyncBar()
     {
         if (barSync || !box.IsHandleCreated)
             return;
 
+        var pos = ScrollPoint();
+        var limit = ScrollLimit(pos);
+        var view = Math.Max(1, box.ClientSize.Height);
         barSync = true;
-        bar.SetRange(Math.Max(1, LineCount()), VisibleLines(), FirstLine());
+        bar.SetRange(limit + view, view, pos.Y);
         barSync = false;
     }
 
-    void ScrollTo(int line)
+    void ScrollTo(int pixels)
     {
         if (barSync || !box.IsHandleCreated)
             return;
 
-        ScrollBy(line - FirstLine());
+        var pos = ScrollPoint();
+        pos.Y = Math.Max(0, pixels);
+        SetScrollPoint(pos);
         SyncBar();
     }
 
-    void ScrollBy(int lines)
+    int ScrollLimit(Point pos)
     {
-        if (lines == 0 || !box.IsHandleCreated)
-            return;
-
-        SendMessage(box.Handle, EM_LINESCROLL, 0, lines);
+        var end = box.GetPositionFromCharIndex(box.TextLength);
+        var content = pos.Y + Math.Max(0, end.Y) + LineHeight;
+        return Math.Max(0, content - box.ClientSize.Height);
     }
 
-    int FirstLine() =>
-        box.IsHandleCreated ? SendMessage(box.Handle, EM_GETFIRSTVISIBLELINE, 0, 0) : 0;
+    Point ScrollPoint()
+    {
+        var pos = new Point();
+        if (box.IsHandleCreated)
+            SendMessage(box.Handle, EM_GETSCROLLPOS, IntPtr.Zero, ref pos);
+        return pos;
+    }
+
+    void SetScrollPoint(Point pos)
+    {
+        if (!box.IsHandleCreated)
+            return;
+
+        SendMessage(box.Handle, EM_SETSCROLLPOS, IntPtr.Zero, ref pos);
+    }
 
     void Hit(Point point)
     {
@@ -394,4 +427,7 @@ sealed class NotesEditor : UserControl
 
     [DllImport("user32.dll")]
     static extern int SendMessage(IntPtr hWnd, int msg, int wParam, int lParam);
+
+    [DllImport("user32.dll", EntryPoint = "SendMessageW")]
+    static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, ref Point lParam);
 }
