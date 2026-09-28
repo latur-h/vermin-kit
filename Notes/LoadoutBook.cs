@@ -144,19 +144,47 @@ sealed class LoadoutBook
         Save();
     }
 
+    bool notesDirty;
+
+    public void StageNotes(string notes)
+    {
+        if (Current is null || !AssignNotes(notes))
+            return;
+
+        notesDirty = true;
+    }
+
+    public void FlushNotes()
+    {
+        if (!notesDirty)
+            return;
+
+        notesDirty = false;
+        Save();
+    }
+
     public void SetNotes(string notes)
     {
-        if (Current is null)
+        if (Current is null || !AssignNotes(notes))
             return;
+
+        notesDirty = false;
+        Save();
+    }
+
+    bool AssignNotes(string notes)
+    {
+        if (Current is null)
+            return false;
 
         notes = notes.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
         if (notes.Length > MaxNotesLength)
             notes = notes[..MaxNotesLength];
         if (Current.Notes == notes)
-            return;
+            return false;
 
         Current.Notes = notes;
-        Save();
+        return true;
     }
 
     public void SetWeapon(string slot, string weaponId)
@@ -333,6 +361,7 @@ sealed class LoadoutBook
 
     void Save()
     {
+        notesDirty = false;
         LoadoutStore.Save(new NotesFile
         {
             CareerId = Career.Id,

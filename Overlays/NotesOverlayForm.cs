@@ -30,6 +30,7 @@ sealed class NotesOverlayForm : OverlayForm
         AutoSize = false
     };
     readonly NotesEditor notesEditor = new();
+    readonly System.Windows.Forms.Timer noteSave = new() { Interval = 200 };
     readonly CrestButton createButton;
     readonly CrestButton deleteButton;
     readonly CheckBox descriptions = new() { Text = "Show Descriptions", AutoSize = true };
@@ -125,7 +126,12 @@ sealed class NotesOverlayForm : OverlayForm
         notesEditor.NotesChanged += (_, _) =>
         {
             if (!Suppressed)
-                book.SetNotes(notesEditor.Export());
+            {
+                book.StageNotes(notesEditor.Export());
+                noteSave.Stop();
+                noteSave.Start();
+            }
+
             UpdateNoteSuggest();
         };
         notesEditor.CaretMoved += (_, _) => UpdateNoteSuggest();
@@ -133,6 +139,12 @@ sealed class NotesOverlayForm : OverlayForm
         notesEditor.Hovered += ShowHover;
         notesEditor.HoverCleared += (_, _) => HideHover();
         notesEditor.WheelPassed += delta => board.Bar.Nudge(delta < 0 ? 64 : -64);
+        noteSave.Tick += (_, _) => FlushNotes();
+        VisibleChanged += (_, _) =>
+        {
+            if (!Visible)
+                FlushNotes();
+        };
         createButton = MakeButton("New");
         createButton.Click += (_, _) =>
         {
@@ -750,6 +762,12 @@ sealed class NotesOverlayForm : OverlayForm
             .OrderBy(item => name(item).StartsWith(query, StringComparison.OrdinalIgnoreCase) ? 0 : 1)
             .ThenBy(item => name(item), StringComparer.OrdinalIgnoreCase);
 
+    void FlushNotes()
+    {
+        noteSave.Stop();
+        book.FlushNotes();
+    }
+
     void ShowHover(int index)
     {
         if (pickerHost.Visible)
@@ -920,11 +938,12 @@ sealed class NotesOverlayForm : OverlayForm
             y += rowHeight + gap;
         }
 
-        var notesWidth = Math.Max(240, inner * 3 / 4);
-        notesCaption.SetBounds(x, y, notesWidth, 22);
+        var notesWidth = Math.Max(240, inner * 3 / 5);
+        var notesX = x + Math.Max(0, (inner - notesWidth) / 2);
+        notesCaption.SetBounds(notesX, y, notesWidth, 22);
         y += 24;
         var notesHeight = Math.Max(360, viewHeight * 28 / 100);
-        notesEditor.SetBounds(x, y, notesWidth, notesHeight);
+        notesEditor.SetBounds(notesX, y, notesWidth, notesHeight);
         return notesEditor.Bottom + pad;
     }
 
