@@ -35,6 +35,7 @@ sealed class NotesEditor : UserControl
     readonly List<(int Start, int Length)> slices = [];
 
     bool painting;
+    int drawHold;
     bool barSync;
     bool rectActive;
     int hoverIndex = -2;
@@ -42,6 +43,8 @@ sealed class NotesEditor : UserControl
     int charWidth;
     Point rectAnchor;
     Point rectFocus;
+    readonly List<(Rectangle Bounds, string Markup)> copyMarks = [];
+    int copyHot = -1;
     int[] paragraphLevels = [];
     string styledText = "";
     List<NoteSpan> styledSpans = [];
@@ -87,9 +90,19 @@ sealed class NotesEditor : UserControl
             if (args.Button == MouseButtons.Left)
                 ClearRect();
         };
-        box.MouseMove += (_, args) => Hit(args.Location);
+        box.MouseMove += (_, args) => OnBoxMove(args.Location);
+        box.AcceptCopy = TryCopy;
+        box.PaintedOver += DrawCopyMarks;
         box.HandleCreated += (_, _) => RestoreIndents();
-        box.MouseLeave += (_, _) => ClearHover();
+        box.MouseLeave += (_, _) =>
+        {
+            ClearHover();
+            if (copyHot < 0)
+                return;
+            copyHot = -1;
+            box.Cursor = Cursors.IBeam;
+            box.Invalidate();
+        };
         box.MouseWheel += (_, args) => OnWheel(args);
         box.PlainPaste += (_, _) => InsertClipboard();
         box.KeyDown += (_, args) => OnBoxKey(args);
@@ -177,7 +190,7 @@ sealed class NotesEditor : UserControl
 
     public string Export()
     {
-        var text = Notes;
+        var text = Notes.Replace(Gap.ToString(), "");
         if (pendingLevels is not null)
             paragraphLevels = pendingLevels.ToArray();
         else if (paragraphLevels.Length != ParagraphCount(text))
@@ -329,7 +342,7 @@ sealed class NotesEditor : UserControl
         var spans = new List<NoteSpan>(NoteMarkup.Find(text));
         var bold = new List<BoldMark>(NoteMarkup.FindBold(text));
         var (editAt, removed, added) = Diff(styledText, text);
-        if (FormattingHolds(spans, bold, editAt, added - removed, caret))
+        if (FormattingHolds(spans, bold, editAt, added - removed, caret) && GapsReady(text, spans, caret))
         {
             styledText = text;
             styledSpans = spans;
@@ -356,11 +369,23 @@ sealed class NotesEditor : UserControl
             return;
         }
 
-        painting = true;
         var scroll = ScrollPoint();
+        SuspendDraw();
+        painting = true;
         HoldUndo();
         try
         {
+            var shifted = SyncGaps(caret);
+            if (shifted != caret || box.Text != text)
+            {
+                caret = shifted;
+                length = 0;
+                text = box.Text;
+                spans = new List<NoteSpan>(NoteMarkup.Find(text));
+                bold = new List<BoldMark>(NoteMarkup.FindBold(text));
+                (editAt, removed, added) = Diff(styledText, text);
+            }
+
             Restyle(text, spans, bold, caret, editAt, removed, added);
             PaintSlices();
             var keep = slices.Count > 0 ? 0 : length;
@@ -383,6 +408,7 @@ sealed class NotesEditor : UserControl
         {
             ReleaseUndo();
             painting = false;
+            ResumeDraw();
         }
     }
 
@@ -517,10 +543,22 @@ sealed class NotesEditor : UserControl
         box.SelectionColor = CardInk;
         SetHidden(false);
         var hiddenStart = nameStart + nameLength;
-        var hiddenEnd = span.Start + take;
-        if (hiddenStart < hiddenEnd)
+        var gapEnd = hiddenStart;
+        var limit = span.Start + take;
+        while (gapEnd < limit && text[gapEnd] == Gap)
+            gapEnd++;
+        if (gapEnd > hiddenStart)
         {
-            box.Select(hiddenStart, hiddenEnd - hiddenStart);
+            box.Select(hiddenStart, gapEnd - hiddenStart);
+            SetHidden(false);
+            box.SelectionColor = Paper;
+            box.SelectionBackColor = Paper;
+            box.SelectionFont = Font;
+        }
+
+        if (gapEnd < limit)
+        {
+            box.Select(gapEnd, limit - gapEnd);
             SetHidden(true);
         }
     }
@@ -693,15 +731,14 @@ sealed class NotesEditor : UserControl
         if (text.Length == 0 || !box.IsHandleCreated)
             return;
 
-        SendMessage(box.Handle, WM_SETREDRAW, 0, 0);
+        SuspendDraw();
         try
         {
             box.SelectedText = text;
         }
         finally
         {
-            SendMessage(box.Handle, WM_SETREDRAW, 1, 0);
-            box.Invalidate();
+            ResumeDraw();
         }
     }
 
@@ -710,10 +747,11 @@ sealed class NotesEditor : UserControl
         if (!box.IsHandleCreated)
             return paragraphLevels;
 
-        painting = true;
         var caret = box.SelectionStart;
         var length = box.SelectionLength;
         var scroll = ScrollPoint();
+        SuspendDraw();
+        painting = true;
         var step = IndentStep();
         var text = box.Text;
         var levels = new int[ParagraphCount(text)];
@@ -740,6 +778,7 @@ sealed class NotesEditor : UserControl
         finally
         {
             painting = false;
+            ResumeDraw();
         }
     }
 
@@ -1205,6 +1244,191 @@ sealed class NotesEditor : UserControl
         return true;
     }
 
+    bool GapsReady(string text, List<NoteSpan> spans, int caret)
+    {
+        foreach (var span in spans)
+        {
+            if (!NoteMarkup.TryVisibleName(text, span, out var start, out var length))
+                continue;
+            var present = GapAt(text, start + length);
+            var wanted = span.Closed && !InsideSpan(span, caret);
+            if (present != wanted)
+                return false;
+        }
+
+        return true;
+    }
+
+    static bool GapAt(string text, int index) =>
+        index + 1 < text.Length && text[index] == Gap && text[index + 1] == Gap;
+
+    int SyncGaps(int caret)
+    {
+        var text = box.Text;
+        var spans = NoteMarkup.Find(text);
+        for (var index = spans.Count - 1; index >= 0; index--)
+        {
+            var span = spans[index];
+            if (!NoteMarkup.TryVisibleName(text, span, out var start, out var length))
+                continue;
+            var at = start + length;
+            if (span.Closed && !InsideSpan(span, caret))
+                caret = InsertGap(at, caret);
+            else
+                caret = RemoveGap(at, caret);
+            text = box.Text;
+        }
+
+        return caret;
+    }
+
+    int InsertGap(int at, int caret)
+    {
+        if (GapAt(box.Text, at))
+            return caret;
+
+        box.Select(Math.Clamp(at, 0, box.TextLength), 0);
+        box.SelectedText = "\u2003\u2003";
+        return caret >= at ? caret + 2 : caret;
+    }
+
+    int RemoveGap(int at, int caret)
+    {
+        var text = box.Text;
+        var count = 0;
+        while (at + count < text.Length && text[at + count] == Gap)
+            count++;
+        if (count == 0)
+            return caret;
+
+        box.Select(at, count);
+        box.SelectedText = "";
+        if (caret >= at + count)
+            return caret - count;
+        return caret > at ? at : caret;
+    }
+
+    void SuspendDraw()
+    {
+        if (drawHold++ == 0 && box.IsHandleCreated)
+            SendMessage(box.Handle, WM_SETREDRAW, 0, 0);
+    }
+
+    void ResumeDraw()
+    {
+        if (drawHold == 0)
+            return;
+        if (--drawHold > 0 || !box.IsHandleCreated)
+            return;
+        SendMessage(box.Handle, WM_SETREDRAW, 1, 0);
+        box.Invalidate();
+    }
+
+    void OnBoxMove(Point point)
+    {
+        var hot = CopyAt(point);
+        if (hot != copyHot)
+        {
+            copyHot = hot;
+            box.Cursor = hot >= 0 ? Cursors.Hand : Cursors.IBeam;
+            box.Invalidate();
+        }
+
+        if (hot >= 0)
+        {
+            ClearHover();
+            return;
+        }
+
+        Hit(point);
+    }
+
+    bool TryCopy(Point point)
+    {
+        var index = CopyAt(point);
+        if (index < 0)
+            return false;
+
+        try
+        {
+            Clipboard.SetText(copyMarks[index].Markup);
+        }
+        catch (ExternalException)
+        {
+        }
+
+        return true;
+    }
+
+    int CopyAt(Point point)
+    {
+        for (var index = 0; index < copyMarks.Count; index++)
+        {
+            if (copyMarks[index].Bounds.Contains(point))
+                return index;
+        }
+
+        return -1;
+    }
+
+    void DrawCopyMarks(Graphics graphics)
+    {
+        copyMarks.Clear();
+        if (!box.IsHandleCreated || box.TextLength == 0)
+            return;
+
+        var text = box.Text;
+        foreach (var span in NoteMarkup.Find(text))
+        {
+            if (!span.Closed || InsideSpan(span, styledCaret))
+                continue;
+            if (!NoteMarkup.TryVisibleName(text, span, out var start, out var length) || length < 1)
+                continue;
+            var gap = start + length;
+            if (!GapAt(text, gap))
+                continue;
+
+            var bounds = CopyBounds(gap);
+            if (bounds.Bottom < 0 || bounds.Top > box.Height)
+                continue;
+
+            var take = Math.Min(span.Length, text.Length - span.Start);
+            if (take < 1)
+                continue;
+            copyMarks.Add((bounds, text.Substring(span.Start, take).Replace(Gap.ToString(), "")));
+        }
+
+        for (var index = 0; index < copyMarks.Count; index++)
+            DrawCopyMark(graphics, copyMarks[index].Bounds, index == copyHot);
+    }
+
+    Rectangle CopyBounds(int gap)
+    {
+        var origin = box.GetPositionFromCharIndex(Math.Clamp(gap, 0, box.TextLength));
+        var after = box.GetPositionFromCharIndex(Math.Min(box.TextLength, gap + 2));
+        var size = Math.Max(14, LineHeight - 6);
+        var width = after.Y == origin.Y ? Math.Max(size, after.X - origin.X) : size;
+        var x = origin.X + Math.Max(0, (width - size) / 2);
+        var y = origin.Y + Math.Max(0, (LineHeight - size) / 2);
+        return new Rectangle(x, y, size, size);
+    }
+
+    static void DrawCopyMark(Graphics graphics, Rectangle bounds, bool hot)
+    {
+        graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+        using var fill = new SolidBrush(hot ? KitLook.ButtonChosen : Color.FromArgb(210, 28, 18, 12));
+        using var pen = new Pen(hot ? KitLook.ButtonChosenBorder : KitLook.Frame, 1.5f);
+        graphics.FillRectangle(fill, bounds);
+        graphics.DrawRectangle(pen, bounds.X, bounds.Y, bounds.Width - 1, bounds.Height - 1);
+        var page = new Rectangle(bounds.X + 4, bounds.Y + 5, 6, 8);
+        var back = new Rectangle(page.X + 3, page.Y - 2, 6, 8);
+        using var pageFill = new SolidBrush(KitLook.Ink);
+        graphics.FillRectangle(pageFill, back);
+        graphics.DrawRectangle(pen, back);
+        graphics.FillRectangle(pageFill, page);
+        graphics.DrawRectangle(pen, page);
+    }
+
     void SetHidden(bool hidden)
     {
         var format = new CHARFORMAT2
@@ -1325,6 +1549,7 @@ sealed class NotesEditor : UserControl
     const int SCF_SELECTION = 1;
     const uint CFM_HIDDEN = 0x00000100;
     const uint CFE_HIDDEN = 0x00000100;
+    const char Gap = '\u2003';
 
     [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
     struct CHARFORMAT2
@@ -1364,6 +1589,12 @@ sealed class NotesEditor : UserControl
     [DllImport("user32.dll", EntryPoint = "SendMessageW")]
     static extern IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, ref IntPtr lParam);
 
+    [DllImport("user32.dll")]
+    static extern IntPtr GetDC(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    static extern int ReleaseDC(IntPtr hWnd, IntPtr hDC);
+
     [ComImport]
     [Guid("8CC497C0-A1DF-11CE-8098-00AA0047BE5D")]
     [InterfaceType(ComInterfaceType.InterfaceIsIDispatch)]
@@ -1383,15 +1614,42 @@ sealed class NotesEditor : UserControl
 
         public event EventHandler? PlainPaste;
 
+        public event Action<Graphics>? PaintedOver;
+
+        public Func<Point, bool>? AcceptCopy;
+
         bool tracking;
 
         protected override void WndProc(ref Message m)
         {
             const int WM_PASTE = 0x0302;
+            const int WM_PAINT = 0x000F;
             const int WM_LBUTTONDOWN = 0x0201;
             if (m.Msg == WM_PASTE)
             {
                 PlainPaste?.Invoke(this, EventArgs.Empty);
+                return;
+            }
+
+            if (m.Msg == WM_LBUTTONDOWN && !BoxMods() && AcceptCopy?.Invoke(MouseFrom(m).Location) == true)
+                return;
+
+            if (m.Msg == WM_PAINT)
+            {
+                base.WndProc(ref m);
+                var dc = GetDC(Handle);
+                if (dc == IntPtr.Zero)
+                    return;
+                try
+                {
+                    using var graphics = Graphics.FromHdc(dc);
+                    PaintedOver?.Invoke(graphics);
+                }
+                finally
+                {
+                    ReleaseDC(Handle, dc);
+                }
+
                 return;
             }
             const int WM_MOUSEMOVE = 0x0200;
