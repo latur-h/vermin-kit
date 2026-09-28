@@ -26,7 +26,6 @@ sealed class NotesEditor : UserControl
         AcceptsTab = true,
         DetectUrls = false,
         ScrollBars = RichTextBoxScrollBars.None,
-        MaxLength = 4000,
         WordWrap = true,
         BackColor = Paper,
         ForeColor = Ink,
@@ -92,6 +91,7 @@ sealed class NotesEditor : UserControl
         box.HandleCreated += (_, _) => RestoreIndents();
         box.MouseLeave += (_, _) => ClearHover();
         box.MouseWheel += (_, args) => OnWheel(args);
+        box.PlainPaste += (_, _) => InsertClipboard();
         box.KeyDown += (_, args) => OnBoxKey(args);
         box.KeyUp += (_, args) =>
         {
@@ -662,7 +662,47 @@ sealed class NotesEditor : UserControl
             }
         }
 
-        paragraphLevels = ReadLevels();
+        var paragraph = ParagraphIndex(before, at);
+        var inherited = paragraph < paragraphLevels.Length ? paragraphLevels[paragraph] : 0;
+        var next = new List<int>(paragraphLevels.Length + addedBreaks);
+        var head = Math.Min(paragraphLevels.Length, paragraph + 1);
+        for (var index = 0; index < head; index++)
+            next.Add(paragraphLevels[index]);
+        for (var extra = 0; extra < addedBreaks; extra++)
+            next.Add(inherited);
+        for (var index = paragraph + 1 + removedBreaks; index < paragraphLevels.Length; index++)
+            next.Add(paragraphLevels[index]);
+        paragraphLevels = next.Count == ParagraphCount(after) ? next.ToArray() : ReadLevels();
+    }
+
+    void InsertClipboard()
+    {
+        string text;
+        try
+        {
+            if (!Clipboard.ContainsText())
+                return;
+            text = Clipboard.GetText();
+        }
+        catch (ExternalException)
+        {
+            return;
+        }
+
+        text = text.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
+        if (text.Length == 0 || !box.IsHandleCreated)
+            return;
+
+        SendMessage(box.Handle, WM_SETREDRAW, 0, 0);
+        try
+        {
+            box.SelectedText = text;
+        }
+        finally
+        {
+            SendMessage(box.Handle, WM_SETREDRAW, 1, 0);
+            box.Invalidate();
+        }
     }
 
     int[] ReadLevels()
@@ -1341,11 +1381,19 @@ sealed class NotesEditor : UserControl
 
         public event MouseEventHandler? RectEnd;
 
+        public event EventHandler? PlainPaste;
+
         bool tracking;
 
         protected override void WndProc(ref Message m)
         {
+            const int WM_PASTE = 0x0302;
             const int WM_LBUTTONDOWN = 0x0201;
+            if (m.Msg == WM_PASTE)
+            {
+                PlainPaste?.Invoke(this, EventArgs.Empty);
+                return;
+            }
             const int WM_MOUSEMOVE = 0x0200;
             const int WM_LBUTTONUP = 0x0202;
             if (m.Msg == WM_LBUTTONDOWN && BoxMods())

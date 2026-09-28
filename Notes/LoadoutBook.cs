@@ -3,7 +3,6 @@ namespace VerminKit;
 sealed class LoadoutBook
 {
     const int MaxNameLength = 80;
-    const int MaxNotesLength = 4000;
 
     readonly GameCatalog catalog;
     readonly List<Loadout> loadouts = [];
@@ -178,8 +177,6 @@ sealed class LoadoutBook
             return false;
 
         notes = notes.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
-        if (notes.Length > MaxNotesLength)
-            notes = notes[..MaxNotesLength];
         if (Current.Notes == notes)
             return false;
 
@@ -308,7 +305,6 @@ sealed class LoadoutBook
     {
         var career = catalog.FindCareer(loadout.CareerId)!;
         loadout.Name = loadout.Name.Length > MaxNameLength ? loadout.Name[..MaxNameLength] : loadout.Name;
-        loadout.Notes = loadout.Notes.Length > MaxNotesLength ? loadout.Notes[..MaxNotesLength] : loadout.Notes;
         loadout.Primary ??= new GearChoice();
         loadout.Secondary ??= new GearChoice();
         loadout.Necklace ??= new GearChoice();
