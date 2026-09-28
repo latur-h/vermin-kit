@@ -106,6 +106,13 @@ sealed class NotesEditor : UserControl
         box.MouseWheel += (_, args) => OnWheel(args);
         box.PlainPaste += (_, _) => InsertClipboard();
         box.KeyDown += (_, args) => OnBoxKey(args);
+        box.KeyPress += (_, args) =>
+        {
+            if (args.KeyChar != '*' || box.SelectionLength == 0)
+                return;
+            WrapStars();
+            args.Handled = true;
+        };
         box.KeyUp += (_, args) =>
         {
             if (!args.Control || args.KeyCode is not (Keys.Z or Keys.Y))
@@ -877,6 +884,23 @@ sealed class NotesEditor : UserControl
         {
             Marshal.Release(unknown);
         }
+    }
+
+    void WrapStars()
+    {
+        var selected = box.SelectedText.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
+        if (selected.Length == 0)
+            return;
+
+        var lines = selected.Split('\n');
+        for (var index = 0; index < lines.Length; index++)
+        {
+            if (lines[index].Length == 0)
+                continue;
+            lines[index] = "*" + lines[index] + "*";
+        }
+
+        box.SelectedText = string.Join("\n", lines);
     }
 
     void OnBoxKey(KeyEventArgs args)
